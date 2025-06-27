@@ -13,71 +13,99 @@ class MyApp extends StatelessWidget {
         appBar: AppBar(
           title: Text('Food Recommendations'),
         ),
-        body: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              SizedBox(height: 100),
+        body: Column(
+          children: [
+            // Main content
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Text(
+                    'You Might Also Like',
+                    style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  ),
 
-              Text(
-                'You Might Also Like',
-                style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold
-                ),
+                  SizedBox(height: 20),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        FoodItem(
+                          image: 'assets/Dessert.png',
+                          title: 'Grahams',
+                        ),
+                        FoodItem(
+                          image: 'assets/Pancit_Canton_Bihon_Guisado.png',
+                          title: 'Bihon',
+                        ),
+                        FoodItem(
+                          image: 'assets/sweet_and_spicy.png',
+                          title: 'Sweet & Spicy',
+                        ),
+                        FoodItem(
+                          image: 'assets/Spaghetti.png',
+                          title: 'Spaghetti',
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 20),
-              // Horizontal list of food items
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    FoodItem(
-                      image: 'assets/Dessert.png',
-                      title: 'Graham',
-                    ),
-                    FoodItem(
-                      image: 'assets/Pancit_Canton_Bihon_Guisado.png',
-                      title: 'Bihon',
-                    ),
-                    FoodItem(
-                      image: 'assets/sweet_and_spicy.png',
-                      title: 'Sweet & Spicy',
-                    ),
-                    FoodItem(
-                      image: 'assets/Spaghetti.png',
-                      title: 'Spaghetti',
-                    ),
-                  ],
-                ),
+            ),
+            // Spacer to push the footer to the bottom
+            Expanded(child: SizedBox.shrink()),
+
+            // Footer Section
+            Container(
+              padding: EdgeInsets.all(16),
+              color: Colors.grey[200],
+              child: Column(
+                children: [
+                  // Footer menu links
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Container(
+                        width: 300,
+                        child: Column(
+                          children: [
+                            Text('Purok 2, Puting Bato East Calaca City Batangas'),
+                            Text('El Callejon Lomi Hauz'),
+                          ],
+                        ),
+                      )
+
+                    ],
+                  ),
+                  SizedBox(height: 30), // Corrected for height space
+
+                  // Email and phone number
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          Icon(Icons.email),
+                          SizedBox(height: 8), // Correct spacing between the icon and text
+                          Text('elcallejonlomihauz@gmail.com'),
+                          SizedBox(height: 16), // Spacing between the email and phone number
+                          Icon(Icons.phone),
+                          SizedBox(height: 8), // Correct spacing between the icon and text
+                          Text('09123456789'),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 16), // Corrected for height space
+                ],
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
   }
 }
-
-class BackgroundClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    Path path = Path();
-    path.lineTo(10, 0);
-    path.quadraticBezierTo(size.width * 0.5, size.height * 0.5, size.width, 0);
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
-}
-
-
 
 class FoodItem extends StatelessWidget {
   final String image;
