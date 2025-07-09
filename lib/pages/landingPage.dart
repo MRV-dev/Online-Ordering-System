@@ -54,10 +54,9 @@ class Landingpage extends StatelessWidget {
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(  // Make the entire body scrollable
+        child: SingleChildScrollView(
           child: Column(
             children: [
-              // Hero Section with food cards
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
@@ -109,18 +108,9 @@ class Landingpage extends StatelessWidget {
                       child: PageView(
                         controller: PageController(viewportFraction: 0.75),
                         children: [
-                          _buildPageCard(
-                            'assets/images/maja.jpg',
-                            'Maja Blanca is a creamy Filipino dessert made from coconut milk, cornstarch, and sweet corn.',
-                          ),
-                          _buildPageCard(
-                            'assets/images/lomi.jpg',
-                            'Lomi is a thick, savory noodle soup made with egg noodles, rich broth, and hearty toppings.',
-                          ),
-                          _buildPageCard(
-                            'assets/images/chami.jpg',
-                            'Chami Lomi is a thick noodle dish made with sautéed egg noodles, rich sauce, and savory toppings.',
-                          ),
+                          _buildPageCard('assets/images/maja.jpg', 'Maja Blanca is a creamy Filipino dessert made from coconut milk, cornstarch, and sweet corn.'),
+                          _buildPageCard('assets/images/lomi.jpg', 'Lomi is a thick, savory noodle soup made with egg noodles, rich broth, and hearty toppings.'),
+                          _buildPageCard('assets/images/chami.jpg', 'Chami Lomi is a thick noodle dish made with saut\u00e9ed egg noodles, rich sauce, and savory toppings.'),
                         ],
                       ),
                     ),
@@ -128,19 +118,63 @@ class Landingpage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20,),
+              SizedBox(height: 20),
 
-              // "You Might Also Like" Section
+              // Our Services Section
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 30.0),
+                color: Colors.white,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Our Services', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 20),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _serviceCard(Icons.delivery_dining, 'Fast Delivery'),
+                        _serviceCard(Icons.restaurant_menu, 'Fresh Menu'),
+                        _serviceCard(Icons.star, 'Top Rated'),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 30),
+
+              // Our Best Selling Section
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+                color: Color(0xFFFFF8E1),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Our Best Selling', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+                    SizedBox(height: 20),
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          FoodItem(image: 'assets/images/lomi.jpg', title: 'Special Lomi'),
+                          FoodItem(image: 'assets/images/chami.jpg', title: 'Chami Lomi'),
+                          FoodItem(image: 'assets/images/maja.jpg', title: 'Maja Blanca'),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              SizedBox(height: 30),
+
+              // You Might Also Like Section
               Container(
                 padding: const EdgeInsets.all(16.0),
                 child: Column(
                   children: [
-                    Text(
-                      'You Might Also Like',
-                      style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                    ),
+                    Text('You Might Also Like', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
                     SizedBox(height: 20),
-                    // Horizontal list of food items
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
@@ -156,7 +190,7 @@ class Landingpage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 30,),
+              SizedBox(height: 30),
 
               // Footer Section
               Container(
@@ -166,14 +200,7 @@ class Landingpage extends StatelessWidget {
                   children: [
                     Align(
                       alignment: Alignment.center,
-                      child: Text(
-                        'CONTACT US',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 17,
-                        ),
-                      ),
+                      child: Text('CONTACT US', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 17)),
                     ),
                     SizedBox(height: 5),
                     Row(
@@ -185,50 +212,34 @@ class Landingpage extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text('Purok 2,', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              SizedBox(height: 3),
                               Text('Puting Bato East', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              SizedBox(height: 3),
                               Text('Calaca City Batangas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
                             ],
                           ),
                         ),
-                        Row(
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('PHONE NO.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
-                                SizedBox(height: 1),
-                                Text('09123456789', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              ],
-                            ),
+                            Text('PHONE NO.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
+                            Text('09123456789', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
                           ],
                         ),
                       ],
                     ),
                     SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    Column(
                       children: [
-                        Column(
+                        Text('FOLLOW US', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            SizedBox(height: 9),
-                            Text('FOLLOW US', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            SizedBox(height: 7),
-                            Row(
-                              children: [
-                                IconButton(icon: Icon(FontAwesomeIcons.facebook, size: 30, color: Colors.white), onPressed: () {}),
-                                SizedBox(width: 7),
-                                IconButton(icon: Icon(FontAwesomeIcons.instagram, size: 30, color: Colors.white), onPressed: () {}),
-                                SizedBox(width: 7),
-                                IconButton(icon: Icon(FontAwesomeIcons.twitter, size: 30, color: Colors.white), onPressed: () {}),
-                              ],
-                            ),
+                            IconButton(icon: Icon(FontAwesomeIcons.facebook, color: Colors.white), onPressed: () {}),
+                            IconButton(icon: Icon(FontAwesomeIcons.instagram, color: Colors.white), onPressed: () {}),
+                            IconButton(icon: Icon(FontAwesomeIcons.twitter, color: Colors.white), onPressed: () {}),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -239,31 +250,20 @@ class Landingpage extends StatelessWidget {
     );
   }
 
-  // Helper method to create PageView cards
   Widget _buildPageCard(String image, String description) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Card(
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         elevation: 5,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Image.asset(image, height: 120),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                description,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: 'Georgia',
-                ),
-              ),
+              child: Text(description, textAlign: TextAlign.center, style: TextStyle(fontSize: 15, fontFamily: 'Georgia')),
             ),
           ],
         ),
@@ -289,26 +289,24 @@ class Landingpage extends StatelessWidget {
         title: const Text('Logout'),
         content: const Text('Are you sure you want to logout?'),
         actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text('Logout'),
-            onPressed: () {
-              // Handle logout logic
-              Navigator.of(context).pop();
-            },
-          ),
+          TextButton(child: const Text('Cancel'), onPressed: () => Navigator.of(context).pop()),
+          TextButton(child: const Text('Logout'), onPressed: () => Navigator.of(context).pop()),
         ],
       ),
     );
   }
+
+  Widget _serviceCard(IconData icon, String title) {
+    return Column(
+      children: [
+        CircleAvatar(radius: 30, backgroundColor: Color(0xFFFFD766), child: Icon(icon, size: 30, color: Colors.black)),
+        SizedBox(height: 10),
+        Text(title, style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+      ],
+    );
+  }
 }
 
-// FoodItem Widget
 class FoodItem extends StatelessWidget {
   final String image;
   final String title;
@@ -324,15 +322,9 @@ class FoodItem extends StatelessWidget {
         children: [
           Image.asset(image, width: 110, height: 110, fit: BoxFit.cover),
           SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
+          Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
           SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text('Order Now'),
-          ),
+          ElevatedButton(onPressed: () {}, child: Text('Order Now')),
         ],
       ),
     );
