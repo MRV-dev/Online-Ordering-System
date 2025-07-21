@@ -5,6 +5,7 @@ class Order {
   final double amount;
   late final String status;
   final List<String> dishes;
+  final String? deliveryTime;
 
   Order({
     required this.orderId,
@@ -12,6 +13,7 @@ class Order {
     required this.orderPlaced,
     required this.amount,
     required this.status,
-    required this.dishes
+    required this.dishes,
+    this.deliveryTime,
   });
 }

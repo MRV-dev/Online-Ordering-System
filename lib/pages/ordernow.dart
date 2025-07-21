@@ -4,6 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
+import 'order_history.dart';
 
 class Ordernow extends StatefulWidget {
   const Ordernow({super.key});
@@ -27,6 +28,15 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     } else {
       print("No image selected.");
     }
+  }
+
+  String _formatTime(TimeOfDay time) {
+    final int hour = time.hour;
+    final int minute = time.minute;
+    final String period = hour >= 12 ? 'PM' : 'AM';
+    final int formattedHour = hour % 12 == 0 ? 12 : hour % 12;  // Convert 24-hour to 12-hour
+    final String formattedMinute = minute.toString().padLeft(2, '0');  // Add leading zero to minutes if necessary
+    return '$formattedHour:$formattedMinute $period';  // Return time in 12-hour format
   }
 
 
@@ -113,7 +123,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     final bool isMobile = MediaQuery.of(context).size.width < 768;
 
     return Scaffold(
-      // backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFFFF7D6),
       appBar: AppBar(
         backgroundColor: const Color(0xFFEFCA6C),
         elevation: 2,
@@ -142,14 +152,18 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           children: [
             const SizedBox(height: 85),
-            _drawerItem(context, 'Home', '/landingpage', FontAwesomeIcons.house),
-            _drawerItem(context, 'Order Now', '/OrderNow', FontAwesomeIcons.cartPlus),
-            _drawerItem(context, 'Contact Us', '/contactus', FontAwesomeIcons.phone),
-            _drawerItem(context, 'Notifications', '/notifications', FontAwesomeIcons.bell),
-            _drawerItem(context, 'Account', '/account', FontAwesomeIcons.user),
+            _drawerItem(
+                context, 'Home', '/landingpage', FontAwesomeIcons.house),
+            _drawerItem(
+                context, 'Order Now', '/OrderNow', FontAwesomeIcons.cartPlus),
+            _drawerItem(context, 'Notifications', '/notifications',
+                FontAwesomeIcons.bell),
+            _drawerItem(context, 'Account', '/profile', FontAwesomeIcons.user),
             ListTile(
-              leading: const Icon(FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
-              title: const Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              leading: const Icon(
+                  FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
+              title: const Text('Logout',
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               onTap: () {
                 Navigator.pop(context);
                 _showLogoutModal(context);
@@ -421,6 +435,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     );
   }
 
+
+
   //Checkout modal
   void _checkout() {
     if (_hashItems()) {
@@ -475,6 +491,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     final fullNameController = TextEditingController();
     final phoneController = TextEditingController();
     final addressController = TextEditingController();
+    TextEditingController timeController = TextEditingController();
     String selectedTime = '';
 
     Future<void> _selectTime(BuildContext context) async {
@@ -482,10 +499,16 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
         context: context,
         initialTime: TimeOfDay.now(),
       );
+
       if (picked != null && picked != TimeOfDay.now()) {
-        selectedTime = "${picked.hour}:${picked.minute}";
+        setState(() {
+          selectedTime = _formatTime(picked);
+          timeController.text = selectedTime;
+        });
       }
     }
+
+
 
     showDialog(
       context: context,
@@ -557,10 +580,9 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                             onTap: () => _selectTime(context),
                             child: AbsorbPointer(
                               child: TextField(
+                                controller: timeController,
                                 decoration: InputDecoration(
-                                  labelText: selectedTime.isEmpty
-                                      ? 'Select Delivery Time'
-                                      : selectedTime,
+                                  labelText: selectedTime.isEmpty ? 'Select Delivery Time' : selectedTime,  // Show time or default message
                                   border: OutlineInputBorder(),
                                 ),
                               ),
@@ -622,58 +644,94 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                           const SizedBox(height: 20),
                           ElevatedButton(
                             onPressed: () {
-                              List<String> selectedItems = [];
-                              double totalAmount = 0;
+                              String fullName = fullNameController.text.trim();
+                              String phoneNumber = phoneController.text.trim();
+                              String address = addressController.text.trim();
+                              String selectedTime = timeController.text.trim();
 
-                              // Loop through Dishes quantities to calculate total and selected dishes
-                              quantities.forEach((name, quantity) {
-                                if (quantity > 0) {
-                                  selectedItems.add(name);  // Add dish, bilao, or dessert to selected list
-                                  String price = '';
-
-                                  // Check if the item belongs to Dishes, Bilao, or Desserts
-                                  if (dishes.any((dish) => dish['name'] == name)) {
-                                    price = dishes.firstWhere((dish) => dish['name'] == name)['price']!;
-                                  } else if (bilao.any((dish) => dish['name'] == name)) {
-                                    price = bilao.firstWhere((dish) => dish['name'] == name)['price']!;
-                                  } else if (desserts.any((dish) => dish['name'] == name)) {
-                                    price = desserts.firstWhere((dish) => dish['name'] == name)['price']!;
-                                  }
-
-                                  // Update total amount
-                                  totalAmount += double.parse(price.replaceAll('₱', '').replaceAll(',', '')) * quantity;
-                                }
-                              });
-
-                              // Create the order if items are selected
-                              if (selectedItems.isNotEmpty) {
-                                final order = Order(
-                                  orderId: _generateOrderId(),  // Generate Order ID with leading zeros
-                                  orderMethod: deliveryOption,
-                                  orderPlaced: DateTime.now().toString(),
-                                  amount: totalAmount,
-                                  status: 'Delivered',
-                                  dishes: selectedItems,
+                              if (fullName.isEmpty || phoneNumber.isEmpty || address.isEmpty || selectedTime.isEmpty) {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: const Text('Missing Information'),
+                                    content: const Text('Please fill in all the fields before proceeding.'),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: const Text('OK'),
+                                      ),
+                                    ],
+                                  ),
                                 );
+                              } else {
+                                List<String> selectedItems = [];
+                                double totalAmount = 0;
+                                quantities.forEach((name, quantity) {
+                                  if (quantity > 0) {
+                                    selectedItems.add(name);
+                                    String price = '';
 
-                                // Close the modal
-                                Navigator.pop(context);
+                                    // Check if the item belongs to Dishes, Bilao, or Desserts
+                                    if (dishes.any((dish) => dish['name'] == name)) {
+                                      price = dishes.firstWhere((dish) => dish['name'] == name)['price']!;
+                                    } else if (bilao.any((dish) => dish['name'] == name)) {
+                                      price = bilao.firstWhere((dish) => dish['name'] == name)['price']!;
+                                    } else if (desserts.any((dish) => dish['name'] == name)) {
+                                      price = desserts.firstWhere((dish) => dish['name'] == name)['price']!;
+                                    }
 
-                                // Reset the quantities after placing the order
-                                setState(() {
-                                  quantities.forEach((key, value) {
-                                    quantities[key] = 0;  // Reset all items to 0 after placing the order
-                                  });
+                                    // Update total amount
+                                    totalAmount += double.parse(price.replaceAll('₱', '').replaceAll(',', '')) * quantity;
+                                  }
                                 });
 
-                                // Add the order to the global orderHistory list
-                                orderHistory.add(order);
+                                // Create the order if items are selected
+                                if (selectedItems.isNotEmpty) {
+                                  final order = Order(
+                                    orderId: _generateOrderId(),
+                                    orderMethod: deliveryOption,
+                                    orderPlaced: DateTime.now().toString(),
+                                    amount: totalAmount,
+                                    status: 'Pending',
+                                    dishes: selectedItems,
+                                    deliveryTime: selectedTime,
+                                  );
 
-                                // Show "Order Placed" confirmation modal
-                                _showOrderPlacedModal(context);
-                              } else {
-                                // Show a message if no items are selected
-                                _showCustomSnackBar('Please add items to your order.');
+                                  // Close the modal
+                                  Navigator.pop(context);
+
+                                  // Reset the quantities after placing the order
+                                  setState(() {
+                                    quantities.forEach((key, value) {
+                                      quantities[key] = 0;  // Reset all items
+                                    });
+                                  });
+
+
+
+                                  orders.add(order);
+                                  // Show order placed modal
+                                  _showOrderPlacedModal(context);
+
+
+                                  Future.delayed(Duration(seconds: 10), () {
+                                    setState(() {
+                                      order.status = 'Delivered';
+
+                                      orders.remove(order);
+                                      orderHistory.add(order);
+                                    });
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OrderHistory(orders: orderHistory),
+                                      ),
+                                    );
+                                  });
+                                } else {
+                                  _showCustomSnackBar('Please add items to your order.');
+                                }
                               }
                             },
                             style: ElevatedButton.styleFrom(
