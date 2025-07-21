@@ -23,7 +23,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'LomiHub',
       debugShowCheckedModeBanner: false,
-      initialRoute: '/landingpage',
+      initialRoute: '/landingPage',
       routes: {
         '/login': (context) => const Login(),
         '/signup': (context) => const Signup(),

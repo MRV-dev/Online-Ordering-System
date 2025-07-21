@@ -31,16 +31,19 @@ dependencies:
   flutter:
     sdk: flutter
 
+
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   font_awesome_flutter: ^10.0.0
   cupertino_icons: ^1.0.8
   image_picker: ^0.8.4+2
+  file_picker: 5.2.11
 
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
+
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -53,26 +56,34 @@ dev_dependencies:
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
+dependency_overrides:
+  file_picker:
+    git:
+      url: https://github.com/miguelpruivo/flutter_file_picker.git
+      ref: master
+
 # The following section is specific to Flutter packages.
 flutter:
- assets:
-  - assets/images/maja.jpg
-  - assets/images/lomi.jpg
-  - assets/images/chami.jpg
-  - assets/images/logo.jpg
-  - assets/images/Dessert.png
-  - assets/images/Pancit_Canton_Bihon_Guisado.png
-  - assets/images/Spaghetti.png
-  - assets/images/sweet_and_spicy.png
-  - assets/images/plain.png
-  - assets/images/tapsilog.png
-  - assets/images/hotsilog.png
-  - assets/images/chami_bilao.png
-  - assets/images/palabok_bilao.png
-  - assets/images/gcash.jpg
-  - assets/images/Graham.png
-  - assets/images/graham-bar.png
-  - assets/images/leche-flan.png
+  uses-material-design: true
+  assets:
+    - assets/images/logo.jpg
+    - assets/images/lomi.jpg
+    - assets/images/sweet_and_spicy.png
+    - assets/images/plain.png
+    - assets/images/bihon.png
+    - assets/images/tapsilog.png
+    - assets/images/hotsilog.png
+    - assets/images/siomaisilog.png
+    - assets/images/siomai-rice.png
+    - assets/images/Pancit_bilao.png
+    - assets/images/Spaghetti_bilao.png
+    - assets/images/palabok_bilao.png
+    - assets/images/chami_bilao.png
+    - assets/images/graham.png
+    - assets/images/leche-flan.png
+    - assets/images/graham-bar.png
+    - assets/images/maja.jpg
+    - assets/images/gcash.jpg
 
 
   #uses-material-design: true

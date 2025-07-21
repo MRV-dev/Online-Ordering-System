@@ -10,7 +10,6 @@ class Landingpage extends StatelessWidget {
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      backgroundColor: const Color(0xFFFFF7D6),
       appBar: AppBar(
         backgroundColor: const Color(0xFFEFCA6C),
         elevation: 2,
@@ -40,8 +39,9 @@ class Landingpage extends StatelessWidget {
             const SizedBox(height: 85),
             _drawerItem(context, 'Home', '/landingpage', FontAwesomeIcons.house),
             _drawerItem(context, 'Order Now', '/OrderNow', FontAwesomeIcons.cartPlus),
+            _drawerItem(context, 'Contact Us', '/contactus', FontAwesomeIcons.phone),
             _drawerItem(context, 'Notifications', '/notifications', FontAwesomeIcons.bell),
-            _drawerItem(context, 'Account', '/profile', FontAwesomeIcons.user),
+            _drawerItem(context, 'Account', '/account', FontAwesomeIcons.user),
             ListTile(
               leading: const Icon(FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
               title: const Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
@@ -57,128 +57,163 @@ class Landingpage extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // Hero Section with text and water curvy background behind it
-              Stack(
-                children: [
-                  ClipPath(
-                    clipper: Wave(),
-                    child: Container(
-                      height: 320, // Adjust height for the curvy background
-                      color: Color(0xFFFFFFFF), // Water color with some transparency
-                    ),
-                  ),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Text(
-                          'Satisfy your cravings',
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontStyle: FontStyle.italic,
-                            color: Colors.redAccent,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        const Text(
-                          'Feel the warmth.\nTaste the flavor.\nLomi at your doorstep.',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                            height: 1.4,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
-                        const SizedBox(height: 32),
-                        ElevatedButton(
-                          onPressed: () {
-                            Navigator.pushNamed(context, '/OrderNow');
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD766),
-                            foregroundColor: Colors.black,
-                            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30),
-                            ),
-                          ),
-                          child: const Text(
-                            'Order Now',
-                            style: TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                        ),
-                        const SizedBox(height: 70),
-                        SizedBox(
-                          height: 320,
-                          child: PageView(
-                            controller: PageController(viewportFraction: 0.75),
-                            children: [
-                              _buildPageCard(
-                                'assets/images/maja.jpg',
-                                'Maja Blanca is a creamy Filipino dessert made from coconut milk, cornstarch, and sweet corn.',
-                              ),
-                              _buildPageCard(
-                                'assets/images/lomi.jpg',
-                                'Lomi is a thick, savory noodle soup made with egg noodles, rich broth, and hearty toppings.',
-                              ),
-                              _buildPageCard(
-                                'assets/images/chami.jpg',
-                                'Chami Lomi is a thick noodle dish made with sautéed egg noodles, rich sauce, and savory toppings.',
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-
-              SizedBox(height: 20,),
-
-              //You Might Like
+              // Hero Section with PageView
               Container(
-                padding: const EdgeInsets.all(24.0),
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 60.0),
+                color: const Color(0xFFF1F9F5),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                     const Text(
-                      "THIS IS WHAT WE DO",
+                      'Satisfy your cravings',
                       style: TextStyle(
-                        fontSize: 14,
-                        letterSpacing: 1.5,
+                        fontSize: 18,
+                        fontStyle: FontStyle.italic,
+                        color: Colors.redAccent,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
-                    const SizedBox(height: 5),
+                    const SizedBox(height: 16),
                     const Text(
-                      "OUR SERVICES",
+                      'Feel the warmth.\nTaste the flavor.\nLomi at your doorstep.',
                       style: TextStyle(
-                        fontSize: 28,
+                        fontSize: 26,
                         fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                        height: 1.4,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 32),
+                    ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushNamed(context, '/OrderNow');
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFFFD766),
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: const Text(
+                        'Order Now',
+                        style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 40),
+                    SizedBox(
+                      height: 320,
+                      child: PageView(
+                        controller: PageController(viewportFraction: 0.75),
+                        children: [
+                          _buildPageCard(
+                            'assets/images/lomi.jpg',
+                            'Lomi is a thick, savory noodle soup made with egg noodles, rich broth, and hearty toppings.',
+                          ),
+                          _buildPageCard(
+                              'assets/images/sweet_and_spicy.png',
+                              'Sweet & Spicy is a stir-fried noodle dish with a chewy texture, flavored with a blend of sweet and spicy sauce.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/plain.png',
+                              'Plain Pancit is a traditional Filipino noodle dish stir-fried with vegetables and light seasoning, perfect for any occasion.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/bihon.png',
+                              'Bihon is a Filipino noodle dish made with thin rice noodles sautéed with vegetables, meat, and savory sauce.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/tapsilog.png',
+                              'Tapsilog is a popular Filipino breakfast meal made with tapa (marinated beef), garlic fried rice, and sunny-side-up egg.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/hotsilog.png',
+                              'Hotsilog is a quick Filipino meal combining hotdog, garlic fried rice, and a fried egg.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/siomaisilog.png',
+                              'Siomaisilog pairs siomai (steamed dumplings) with garlic fried rice and egg for a savory Filipino combo.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/siomai-rice.png',
+                              'Siomai Rice is a filling meal of steamed dumplings served over seasoned rice, often with soy sauce and chili garlic.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/Pancit_bilao.png',
+                              'Pancit Bilao is a festive noodle platter typically served on a bilao tray, perfect for sharing at gatherings.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/Spaghetti_bilao.png',
+                              'Spaghetti Bilao features sweet-style Filipino spaghetti topped with cheese, served in a tray for parties.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/palabok_bilao.png',
+                              'Palabok Bilao is a rich noodle platter with thick sauce, shrimp, egg, and chicharon toppings, served on a bilao.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/chami_bilao.png',
+                              'Chami Bilao offers a saucy and savory noodle dish served on a large tray, ideal for group feasts.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/graham.png',
+                              'Graham is a chilled layered dessert made with graham crackers, sweetened cream, and fruit like mango or banana.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/leche-flan.png',
+                              'Leche Flan is a smooth, creamy caramel custard made with eggs, milk, and sugar.'
+                          ),
+                          _buildPageCard(
+                              'assets/images/graham-bar.png',
+                              'Graham Bar is a bite-sized version of graham dessert, layered with cream and crushed graham for a sweet treat.'
+                          ),
+                          _buildPageCard(
+                            'assets/images/maja.jpg',
+                            'Maja Blanca is a creamy Filipino dessert made from coconut milk, cornstarch, and sweet corn.',
+                          ),
 
-                    const ServiceCard(
-                      icon: FontAwesomeIcons.shippingFast,
+
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Container(
+                color: const Color(0xFFF3D9B1),
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: const [
+                    Text(
+                      "THIS IS WHAT WE DO",
+                      style: TextStyle(fontSize: 14, letterSpacing: 1.5),
+                    ),
+                    SizedBox(height: 5),
+                    Text(
+                      "OUR SERVICES",
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                    ),
+                    SizedBox(height: 20),
+                    ServiceCard(
+                      icon: Icons.local_shipping,
                       title: "Delivery",
                       description:
                       "Our delivery service offers a convenient way to receive your items directly at your doorstep. We ensure fast, reliable, and contactless delivery within the designated service area. Simply place your order online or by phone, and we’ll handle the rest.",
                     ),
-                    const SizedBox(height: 20),
-                    const ServiceCard(
-                      icon: FontAwesomeIcons.shoppingBag,
+                    SizedBox(height: 20),
+                    ServiceCard(
+                      icon: Icons.shopping_bag,
                       title: "Pickup",
                       description:
                       "With our pickup service, you can place your order in advance and pickup at your convenience. This option is perfect for those who prefer to save time and avoid waiting in lines. Just choose your pickup time, and your order will be ready when you arrive.",
                     ),
-                    const SizedBox(height: 20),
-                    const ServiceCard(
-                      icon: FontAwesomeIcons.calendarAlt,
+                    SizedBox(height: 20),
+                    ServiceCard(
+                      icon: Icons.event_available,
                       title: "Reservation",
                       description:
                       "Our reservation service allows you to secure a spot in advance. Make your reservation online, and enjoy priority access and guaranteed availability without the hassle.",
@@ -187,21 +222,16 @@ class Landingpage extends StatelessWidget {
                 ),
               ),
 
-              SizedBox(height: 20,),
+              const SizedBox(height: 30),
 
-              Container(
-                padding: const EdgeInsets.all(30),
-                decoration: BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                ),
+              // Best Selling Section
+              Padding(
+                padding: const EdgeInsets.all(20),
                 child: Column(
                   children: [
                     const Text(
                       'Our Best Selling',
-                      style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
                     ),
                     const SizedBox(height: 20),
                     Wrap(
@@ -211,19 +241,19 @@ class Landingpage extends StatelessWidget {
                         BestSellingCard(
                           title: 'Best Selling Dishes',
                           itemName: 'Lomi',
-                          image: 'assets/images/lomi.jpg',
+                          imageUrl: 'assets/images/lomi.jpg',
                           bgColor: Color(0xFFCFF4F0),
                         ),
                         BestSellingCard(
                           title: 'Best Selling Bilao',
                           itemName: 'Palabok',
-                          image: 'assets/images/palabok_bilao.png',
+                          imageUrl: 'assets/images/palabok_bilao.png',
                           bgColor: Color(0xFFF8D1DC),
                         ),
                         BestSellingCard(
                           title: 'Best Selling Desserts',
                           itemName: 'Leche Flan',
-                          image: 'assets/images/leche-flan.png',
+                          imageUrl: 'assets/images/leche-flan.png',
                           bgColor: Color(0xFFCFF3FC),
                         ),
                       ],
@@ -232,30 +262,26 @@ class Landingpage extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 30),
 
-              // "You Might Also Like" Section
+              // You Might Also Like Section
               Container(
                 padding: const EdgeInsets.all(16.0),
-                height: 310,
-                decoration: BoxDecoration(
-                  color: Color(0xFFFFFFFF),
-                ),
                 child: Column(
                   children: [
-                    Text(
+                    const Text(
                       'You Might Also Like',
                       style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(height: 20),
-                    // Horizontal list of food items
+                    const SizedBox(height: 20),
                     SingleChildScrollView(
                       scrollDirection: Axis.horizontal,
                       child: Row(
-                        children: [
+                        children: const [
                           FoodItem(image: 'assets/images/Dessert.png', title: 'Grahams'),
-                          FoodItem(image: 'assets/images/Pancit_Canton_Bihon_Guisado.png', title: 'Bihon'),
+                          FoodItem(image: 'assets/images/Pancit_bilao.png', title: 'bihon'),
                           FoodItem(image: 'assets/images/sweet_and_spicy.png', title: 'Sweet & Spicy'),
-                          FoodItem(image: 'assets/images/Spaghetti.png', title: 'Spaghetti'),
+                          FoodItem(image: 'assets/images/Spaghetti_bilao.png', title: 'Spaghetti'),
                         ],
                       ),
                     ),
@@ -263,14 +289,15 @@ class Landingpage extends StatelessWidget {
                 ),
               ),
 
+              const SizedBox(height: 30),
 
               // Footer Section
               Container(
-                padding: EdgeInsets.only(left: 25, top: 18, right: 25, bottom: 14),
-                color: Color(0xFF131615),
+                padding: const EdgeInsets.only(left: 25, top: 18, right: 25, bottom: 14),
+                color: const Color(0xFF131615),
                 child: Column(
                   children: [
-                    Align(
+                    const Align(
                       alignment: Alignment.center,
                       child: Text(
                         'CONTACT US',
@@ -281,60 +308,48 @@ class Landingpage extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(height: 5),
+                    const SizedBox(height: 5),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Container(
-                          constraints: BoxConstraints(maxWidth: 150),
-                          child: Column(
+                          constraints: const BoxConstraints(maxWidth: 150),
+                          child: const Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Purok 2,', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              SizedBox(height: 3),
-                              Text('Puting Bato East', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              SizedBox(height: 3),
-                              Text('Calaca City Batangas', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
+                              Text('Purok 2,', style: TextStyle(color: Colors.white, fontSize: 13)),
+                              Text('Puting Bato East', style: TextStyle(color: Colors.white, fontSize: 13)),
+                              Text('Calaca City Batangas', style: TextStyle(color: Colors.white, fontSize: 13)),
                             ],
                           ),
                         ),
-                        Row(
+                        const Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                                Text('PHONE NO.', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w700, fontSize: 12)),
-                                SizedBox(height: 1),
-                                Text('09123456789', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w400, fontSize: 13)),
-                              ],
-                            ),
+                            Text('PHONE NO.', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w700)),
+                            Text('09123456789', style: TextStyle(color: Colors.white, fontSize: 13)),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
+                    const SizedBox(height: 20),
+                    Column(
                       children: [
-                        Column(
-                          children: [
-                            SizedBox(height: 9),
-                            Text('FOLLOW US', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
-                            SizedBox(height: 7),
-                            Row(
-                              children: [
-                                IconButton(icon: Icon(FontAwesomeIcons.facebook, size: 30, color: Colors.white), onPressed: () {}),
-                                SizedBox(width: 7),
-                                IconButton(icon: Icon(FontAwesomeIcons.instagram, size: 30, color: Colors.white), onPressed: () {}),
-                                SizedBox(width: 7),
-                                IconButton(icon: Icon(FontAwesomeIcons.twitter, size: 30, color: Colors.white), onPressed: () {}),
-                              ],
-                            ),
+                        const Text('FOLLOW US', style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 7),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: const [
+                            Icon(FontAwesomeIcons.facebook, size: 30, color: Colors.white),
+                            SizedBox(width: 10),
+                            Icon(FontAwesomeIcons.instagram, size: 30, color: Colors.white),
+                            SizedBox(width: 10),
+                            Icon(FontAwesomeIcons.twitter, size: 30, color: Colors.white),
                           ],
                         ),
                       ],
                     ),
-                    SizedBox(height: 16),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
@@ -345,16 +360,13 @@ class Landingpage extends StatelessWidget {
     );
   }
 
-  // Helper method to create PageView cards
   Widget _buildPageCard(String image, String description) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 12.0),
       child: Card(
         color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
-        ),
-        elevation: 2,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        elevation: 5,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -365,10 +377,7 @@ class Landingpage extends StatelessWidget {
               child: Text(
                 description,
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontFamily: 'Georgia',
-                ),
+                style: const TextStyle(fontSize: 15, fontFamily: 'Georgia'),
               ),
             ),
           ],
@@ -376,46 +385,34 @@ class Landingpage extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _drawerItem(BuildContext context, String title, String route, IconData icon) {
-    return ListTile(
-      leading: FaIcon(icon, color: Colors.black, size: 23),
-      title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
-      onTap: () {
-        Navigator.pop(context);
-        Navigator.pushNamed(context, route);
-      },
-    );
-  }
+// FoodItem widget
+class FoodItem extends StatelessWidget {
+  final String image;
+  final String title;
 
-  void _showLogoutModal(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Logout'),
-        content: const Text('Are you sure you want to logout?'),
-        actions: <Widget>[
-          TextButton(
-            child: const Text('Cancel'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text('Logout'),
-            onPressed: () {
-              // Handle logout logic
-              Navigator.of(context).pop();
-            },
-          ),
+  const FoodItem({super.key, required this.image, required this.title});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 150,
+      margin: const EdgeInsets.only(right: 16),
+      child: Column(
+        children: [
+          Image.asset(image, width: 110, height: 110, fit: BoxFit.cover),
+          const SizedBox(height: 10),
+          Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+          const SizedBox(height: 10),
+          ElevatedButton(onPressed: () {}, child: const Text('Order Now')),
         ],
       ),
     );
   }
 }
 
-
-// ServiceCard Widget
+// ServiceCard widget
 class ServiceCard extends StatelessWidget {
   final IconData icon;
   final String title;
@@ -432,17 +429,11 @@ class ServiceCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.only(topLeft: Radius.circular(100), topRight: Radius.circular(100), bottomLeft:
-        Radius.circular(20), bottomRight: Radius.circular(20)),
+        borderRadius: BorderRadius.circular(16),
         color: const Color(0xFFE7E9D1),
         boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 4),
-          ),
+          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -454,25 +445,15 @@ class ServiceCard extends StatelessWidget {
               borderRadius: BorderRadius.vertical(top: Radius.circular(80)),
             ),
             alignment: Alignment.center,
-            child: Icon(icon, size: 48, color: Colors.brown),
+            child: Icon(icon, size: 48, color: Colors.yellowAccent),
           ),
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Text(
-                  description,
-                  textAlign: TextAlign.justify,
-                  style: const TextStyle(fontSize: 14),
-                ),
+                Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 8),
+                Text(description, textAlign: TextAlign.justify, style: const TextStyle(fontSize: 14)),
               ],
             ),
           ),
@@ -482,17 +463,18 @@ class ServiceCard extends StatelessWidget {
   }
 }
 
+// BestSellingCard widget
 class BestSellingCard extends StatelessWidget {
   final String title;
   final String itemName;
-  final String image;
+  final String imageUrl;
   final Color bgColor;
 
   const BestSellingCard({
     super.key,
     required this.title,
     required this.itemName,
-    required this.image,
+    required this.imageUrl,
     required this.bgColor,
   });
 
@@ -512,46 +494,20 @@ class BestSellingCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 16,
-                  fontStyle: FontStyle.italic,
-                  color: Colors.deepOrange,
-                ),
-              ),
-              Text(
-                itemName,
-                style: const TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(title, style: const TextStyle(fontSize: 16, fontStyle: FontStyle.italic, color: Colors.deepOrange)),
+              Text(itemName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Row(
-                children: [
-                  Text(
-                    'Order Now',
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                      fontSize: 14,
-                      color: Colors.black87,
-                    ),
-                  ),
-                  const Icon(FontAwesomeIcons.arrowRight, size: 15),
+                children: const [
+                  Text('Order Now', style: TextStyle(decoration: TextDecoration.underline, fontSize: 14)),
+                  Icon(Icons.arrow_right_alt, size: 20),
                 ],
               ),
             ],
           ),
-          // Image
           ClipRRect(
             borderRadius: BorderRadius.circular(50),
-            child: Image.asset(
-              image,
-              width: 70,
-              height: 70,
-              fit: BoxFit.cover,
-            ),
+            child: Image.network(imageUrl, width: 70, height: 70, fit: BoxFit.cover),
           ),
         ],
       ),
@@ -559,73 +515,39 @@ class BestSellingCard extends StatelessWidget {
   }
 }
 
-// FoodItem Widget
-class FoodItem extends StatelessWidget {
-  final String image;
-  final String title;
-
-  const FoodItem({super.key, required this.image, required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 150,
-      margin: EdgeInsets.only(right: 16),
-      child: Column(
-        children: [
-          Image.asset(image, width: 110, height: 110, fit: BoxFit.cover),
-          SizedBox(height: 10),
-          Text(
-            title,
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-          ),
-          SizedBox(height: 10),
-          ElevatedButton(
-            onPressed: () {},
-            child: Text('Order Now'),
-          ),
-        ],
-      ),
-    );
-  }
+Widget _drawerItem(BuildContext context, String title, String route, IconData icon) {
+  return ListTile(
+    leading: FaIcon(icon, color: Colors.black, size: 23),
+    title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+    onTap: () {
+      Navigator.pop(context);
+      Navigator.pushNamed(context, route);
+    },
+  );
 }
 
-
-class Wave extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-
-    // Start at the bottom left of the canvas
-    path.lineTo(0, size.height);
-
-    // First wave curve upwards
-    var point1 = Offset(size.width * 0.25, size.height * 0.4);
-    var point2 = Offset(size.width * 0.4, size.height * 0.45);
-
-    path.quadraticBezierTo(point1.dx, point1.dy, point2.dx, point2.dy);
-
-    // Second wave curve upwards
-    var point3 = Offset(size.width * 0.5, size.height * 0.4);
-    var point4 = Offset(size.width * 0.68, size.height * 0.54);
-
-    path.quadraticBezierTo(point3.dx, point3.dy, point4.dx, point4.dy);
-
-    // Third wave curve upwards
-    var point5 = Offset(size.width * 0.85, size.height * 0.6);
-    var point6 = Offset(size.width, size.height * 0.1);
-
-    path.quadraticBezierTo(point5.dx, point5.dy, point6.dx, point6.dy);
-
-    // Connect back to the top right
-    path.lineTo(size.width, 0);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) {
-    return false;
-  }
+void _showLogoutModal(BuildContext context) {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Logout'),
+      content: const Text('Are you sure you want to logout?'),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.of(context).pop(), // Close dialog only
+          child: const Text('Cancel'),
+        ),
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop(); // Close the dialog first
+            Navigator.of(context).pushNamedAndRemoveUntil(
+              '/login',
+                  (route) => false, // Remove all previous routes
+            );
+          },
+          child: const Text('Logout'),
+        ),
+      ],
+    ),
+  );
 }

@@ -38,6 +38,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     'Bihon': 0,
     'Tapsilog': 0,
     'Hotsilog': 0,
+    'Siomaisilog': 0,
+    'Siomai Rice': 0,
     'Pancit Bilao': 0,
     'Spaghetti Bilao': 0,
     'Palabok Bilao': 0,
@@ -50,25 +52,27 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
 
   final List<Map<String, String>> dishes = [
     {'name': 'Lomi', 'price': '₱75.00', 'image': 'assets/images/lomi.jpg'},
-    {'name': 'Sweet & Spicy', 'price': '₱75.00', 'image': 'assets/images/sweet_and_spicy.png'},
-    {'name': 'Plain', 'price': '₱75.00', 'image': 'assets/images/plain.png'},
-    {'name': 'Bihon', 'price': '₱75.00', 'image': 'assets/images/Pancit_Canton_Bihon_Guisado.png'},
-    {'name': 'Tapsilog', 'price': '₱75.00', 'image': 'assets/images/tapsilog.png'},
+    {'name': 'Sweet & Spicy', 'price': '₱115.00', 'image': 'assets/images/sweet_and_spicy.png'},
+    {'name': 'Plain', 'price': '₱110.00', 'image': 'assets/images/plain.png'},
+    {'name': 'Bihon', 'price': '₱90.00', 'image': 'assets/images/bihon.png'},
+    {'name': 'Tapsilog', 'price': '₱95.00', 'image': 'assets/images/tapsilog.png'},
     {'name': 'Hotsilog', 'price': '₱75.00', 'image': 'assets/images/hotsilog.png'},
+    {'name': 'Siomaisilog', 'price': '₱70.00', 'image': 'assets/images/siomaisilog.png'},
+    {'name': 'Siomai Rice', 'price': '₱55.00', 'image': 'assets/images/siomai-rice.png'},
   ];
 
   final List<Map<String, String>> bilao = [
-    {'name': 'Pancit Bilao', 'price': '₱250.00', 'image': 'assets/images/Pancit_Canton_Bihon_Guisado.png',},
-    {'name': 'Spaghetti Bilao', 'price': '₱280.00', 'image': 'assets/images/Spaghetti.png',},
+    {'name': 'Pancit Bilao', 'price': '₱250.00', 'image': 'assets/images/Pancit_bilao.png',},
+    {'name': 'Spaghetti Bilao', 'price': '₱280.00', 'image': 'assets/images/Spaghetti_bilao.png',},
     {'name': 'Palabok Bilao', 'price': '₱300.00', 'image': 'assets/images/palabok_bilao.png',},
     {'name': 'Chami Bilao', 'price': '₱270.00', 'image': 'assets/images/chami_bilao.png',},
   ];
 
   final List<Map<String, String>> desserts = [
-    {'name': 'Graham', 'price': '₱75.00', 'image': 'assets/images/Graham.png'},
-    {'name': 'Leche Plan', 'price': '₱75.00', 'image': 'assets/images/leche-flan.png'},
-    {'name': 'Graham Bar', 'price': '₱75.00', 'image': 'assets/images/graham-bar.png'},
-    {'name': 'Maja Blanca', 'price': '₱75.00', 'image': 'assets/images/maja.jpg'},
+    {'name': 'Graham', 'price': '₱75.00', 'image': 'assets/images/graham.png'},
+    {'name': 'Leche Plan', 'price': '₱100.00', 'image': 'assets/images/leche-flan.png'},
+    {'name': 'Graham Bar', 'price': '₱25.00', 'image': 'assets/images/graham-bar.png'},
+    {'name': 'Maja Blanca', 'price': '₱100.00', 'image': 'assets/images/maja.jpg'},
   ];
 
 
@@ -147,10 +151,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                 FontAwesomeIcons.bell),
             _drawerItem(context, 'Account', '/profile', FontAwesomeIcons.user),
             ListTile(
-              leading: const Icon(
-                  FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
-              title: const Text('Logout',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+              leading: const Icon(FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
+              title: const Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               onTap: () {
                 Navigator.pop(context);
                 _showLogoutModal(context);
@@ -253,11 +255,11 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
               ],
             ),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
                 const SizedBox(height: 1),
-              Image.asset(dish['image']!, height: 90, fit: BoxFit.cover),
-              const SizedBox(height: 8),
+                Image.asset(dish['image']!, height: 90, fit: BoxFit.cover),
+                const SizedBox(height: 8),
                 Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
                 Text(dish['price']!, style: const TextStyle(color: Colors.black54)),
                 const SizedBox(height: 1),
@@ -318,37 +320,37 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
               ],
             ),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-            Image.asset(bilao['image']!, height: 80, fit: BoxFit.cover),
-            const SizedBox(height: 8,),
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(bilao['price']!, style: const TextStyle(color: Colors.black54)),
-              const SizedBox(height: 10),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.circleMinus, color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        if (quantities[name]! > 0) {
-                          quantities[name] = quantities[name]! - 1;
-                        }
-                      });
-                    },
-                  ),
-                  Text('${quantities[name]}'),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.circlePlus, color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        quantities[name] = quantities[name]! + 1;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(bilao['image']!, height: 80, fit: BoxFit.cover),
+                const SizedBox(height: 8,),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(bilao['price']!, style: const TextStyle(color: Colors.black54)),
+                const SizedBox(height: 10),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const FaIcon(FontAwesomeIcons.circleMinus, color: Colors.black),
+                      onPressed: () {
+                        setState(() {
+                          if (quantities[name]! > 0) {
+                            quantities[name] = quantities[name]! - 1;
+                          }
+                        });
+                      },
+                    ),
+                    Text('${quantities[name]}'),
+                    IconButton(
+                      icon: const FaIcon(FontAwesomeIcons.circlePlus, color: Colors.black),
+                      onPressed: () {
+                        setState(() {
+                          quantities[name] = quantities[name]! + 1;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           );
@@ -383,37 +385,37 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
               ],
             ),
             child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-            Image.asset(dessert['image']!, height: 90, fit: BoxFit.cover),
-            const SizedBox(height: 8,),
-              Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
-              Text(dessert['price']!, style: const TextStyle(color: Colors.black54)),
-              const SizedBox(height: 1),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.circleMinus, color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        if (quantities[name]! > 0) {
-                          quantities[name] = quantities[name]! - 1;
-                        }
-                      });
-                    },
-                  ),
-                  Text('${quantities[name]}'),
-                  IconButton(
-                    icon: const FaIcon(FontAwesomeIcons.circlePlus, color: Colors.black),
-                    onPressed: () {
-                      setState(() {
-                        quantities[name] = quantities[name]! + 1;
-                      });
-                    },
-                  ),
-                ],
-              ),
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Image.asset(dessert['image']!, height: 90, fit: BoxFit.cover),
+                const SizedBox(height: 8,),
+                Text(name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                Text(dessert['price']!, style: const TextStyle(color: Colors.black54)),
+                const SizedBox(height: 1),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    IconButton(
+                      icon: const FaIcon(FontAwesomeIcons.circleMinus, color: Colors.black),
+                      onPressed: () {
+                        setState(() {
+                          if (quantities[name]! > 0) {
+                            quantities[name] = quantities[name]! - 1;
+                          }
+                        });
+                      },
+                    ),
+                    Text('${quantities[name]}'),
+                    IconButton(
+                      icon: const FaIcon(FontAwesomeIcons.circlePlus, color: Colors.black),
+                      onPressed: () {
+                        setState(() {
+                          quantities[name] = quantities[name]! + 1;
+                        });
+                      },
+                    ),
+                  ],
+                ),
               ],
             ),
           );
@@ -421,8 +423,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
       ),
     );
   }
-
-
 
   //Checkout modal
   void _checkout() {

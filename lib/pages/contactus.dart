@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 
 class ContactUs extends StatelessWidget {
   const ContactUs({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final bool isMobile = MediaQuery.of(context).size.width < 768;
+    final bool isMobile = MediaQuery
+        .of(context)
+        .size
+        .width < 768;
 
     return Scaffold(
       appBar: AppBar(
@@ -20,10 +24,11 @@ class ContactUs extends StatelessWidget {
         actions: isMobile
             ? [
           Builder(
-            builder: (context) => IconButton(
-              icon: const Icon(Icons.menu, color: Colors.black),
-              onPressed: () => Scaffold.of(context).openEndDrawer(),
-            ),
+            builder: (context) =>
+                IconButton(
+                  icon: const Icon(Icons.menu, color: Colors.black),
+                  onPressed: () => Scaffold.of(context).openEndDrawer(),
+                ),
           ),
         ]
             : null,
@@ -35,14 +40,14 @@ class ContactUs extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 12),
           children: [
             const SizedBox(height: 85),
-            _drawerItem(context, 'Home', '/landingpage'),
-            _drawerItem(context, 'Order Now', '/ordernow'),
-            _drawerItem(context, 'Contact Us', '/contactus'),
-            _iconItem(context, 'Notifications', Icons.notifications, '/notifications'),
-            _iconItem(context, 'Account', Icons.account_circle, '/profile'),
+            _drawerItem(context, 'Home', '/landingpage', FontAwesomeIcons.house),
+            _drawerItem(context, 'Order Now', '/OrderNow', FontAwesomeIcons.cartPlus),
+            _drawerItem(context, 'Contact Us', '/contactus', FontAwesomeIcons.phone),
+            _drawerItem(context, 'Notifications', '/notifications', FontAwesomeIcons.bell),
+            _drawerItem(context, 'Account', '/account', FontAwesomeIcons.user),
             ListTile(
-              leading: const Icon(Icons.logout),
-              title: const Text('Logout'),
+              leading: const Icon(FontAwesomeIcons.arrowRightFromBracket, color: Colors.black),
+              title: const Text('Logout', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
               onTap: () {
                 Navigator.pop(context);
                 _showLogoutModal(context);
@@ -131,17 +136,18 @@ class ContactUs extends StatelessWidget {
     );
   }
 
-  Widget _drawerItem(BuildContext context, String title, String route) {
+  Widget _drawerItem(BuildContext context, String title, String route, IconData icon) {
     return ListTile(
-      title: Text(title, style: const TextStyle(fontSize: 16)),
+      leading: FaIcon(icon, color: Colors.black, size: 23),
+      title: Text(title, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
       onTap: () {
         Navigator.pop(context);
         Navigator.pushNamed(context, route);
       },
     );
   }
-
-  Widget _iconItem(BuildContext context, String title, IconData icon, String route) {
+  Widget _iconItem(BuildContext context, String title, IconData icon,
+      String route) {
     return ListTile(
       leading: Icon(icon),
       title: Text(title, style: const TextStyle(fontSize: 16)),
@@ -153,47 +159,30 @@ class ContactUs extends StatelessWidget {
   }
 
   void _showLogoutModal(BuildContext context) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      backgroundColor: const Color(0xFFEFCA6C),
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(25)),
-      ),
-      builder: (_) => Padding(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Are you sure you want to log out?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                foregroundColor: Colors.black,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(30),
-                  side: const BorderSide(color: Colors.black),
-                ),
-                minimumSize: const Size.fromHeight(50),
+      builder: (context) =>
+          AlertDialog(
+            title: const Text('Logout'),
+            content: const Text('Are you sure you want to logout?'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                // Close dialog only
+                child: const Text('Cancel'),
               ),
-              child: const Text('Logout'),
-            ),
-            const SizedBox(height: 10),
-            OutlinedButton(
-              onPressed: () => Navigator.pop(context),
-              style: OutlinedButton.styleFrom(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
-                minimumSize: const Size.fromHeight(50),
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop(); // Close the dialog first
+                  Navigator.of(context).pushNamedAndRemoveUntil(
+                    '/login',
+                        (route) => false, // Remove all previous routes
+                  );
+                },
+                child: const Text('Logout'),
               ),
-              child: const Text('Cancel'),
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
     );
   }
 }
