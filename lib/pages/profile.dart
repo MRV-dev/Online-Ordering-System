@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:online_ordering_system/pages/password.dart';
-import '../globals.dart';
-import '../models/orderhistorymodel.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'order_history.dart';
