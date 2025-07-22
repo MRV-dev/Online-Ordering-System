@@ -28,8 +28,7 @@ class Landingpage extends StatelessWidget {
               onPressed: () => Scaffold.of(context).openEndDrawer(),
             ),
           ),
-        ]
-            : null,
+        ] : null,
       ),
       endDrawer: Drawer(
         backgroundColor: const Color(0xFFEFCA6C),

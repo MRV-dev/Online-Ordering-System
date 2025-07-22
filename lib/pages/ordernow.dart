@@ -5,6 +5,9 @@ import 'package:image_picker/image_picker.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 import 'order_history.dart';
+import 'orders.dart';
+
+
 
 class Ordernow extends StatefulWidget {
   const Ordernow({super.key});
@@ -18,6 +21,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
   String deliveryOption = 'Delivery';
   final ImagePicker _picker = ImagePicker();
   File? _image;
+
 
   Future<void> _pickImage() async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -34,9 +38,9 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     final int hour = time.hour;
     final int minute = time.minute;
     final String period = hour >= 12 ? 'PM' : 'AM';
-    final int formattedHour = hour % 12 == 0 ? 12 : hour % 12;  // Convert 24-hour to 12-hour
-    final String formattedMinute = minute.toString().padLeft(2, '0');  // Add leading zero to minutes if necessary
-    return '$formattedHour:$formattedMinute $period';  // Return time in 12-hour format
+    final int formattedHour = hour % 12 == 0 ? 12 : hour % 12;
+    final String formattedMinute = minute.toString().padLeft(2, '0');
+    return '$formattedHour:$formattedMinute $period';
   }
 
 
@@ -696,6 +700,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     dishes: selectedItems,
                                     deliveryTime: selectedTime,
                                   );
+
+                                  startFoodReadinessTimer(order.orderId);
 
                                   // Close the modal
                                   Navigator.pop(context);

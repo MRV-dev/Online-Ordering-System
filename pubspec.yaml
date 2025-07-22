@@ -37,6 +37,8 @@ dependencies:
   cupertino_icons: ^1.0.8
   image_picker: ^0.8.4+2
   file_picker: 5.2.11
+  shared_preferences: ^2.2.2
+
 
 
 dev_dependencies:

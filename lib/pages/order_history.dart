@@ -3,47 +3,105 @@ import 'package:online_ordering_system/models/orderhistorymodel.dart';
 import '../globals.dart';
 
 class OrderHistory extends StatelessWidget {
-  const OrderHistory({super.key, required List<Order> orders});
+  OrderHistory({super.key, required List<Order> orders});
+
+  final List<Order> orders = orderHistory;
 
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Order History',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            orderHistory.isNotEmpty
-                ? ListView.builder(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text('Order History',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 10),
+          if (orders.isNotEmpty)
+            ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: orderHistory.length,
+              itemCount: orders.length,
               itemBuilder: (context, index) {
-                final order = orderHistory[index];
-                return _buildOrderCard(
-                  order.orderId,
-                  order.orderMethod,
-                  order.orderPlaced,
-                  '₱${order.amount.toStringAsFixed(2)}',
-                  context,
+                final order = orders[index];
+                return Card(
+                  margin: const EdgeInsets.symmetric(vertical: 13),
+                  child: ListTile(
+                    title: Text('Order ID: ${order.orderId}'),
+                    subtitle: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('Method: ${order.orderMethod}'),
+                        Text('Amount: ₱${order.amount.toStringAsFixed(2)}'),
+                        Text('Status: ${order.status}'),
+                        Text('Placed: ${order.orderPlaced}'),
+                      ],
+                    ),
+                    onTap: () => _showOrderDetailsModal(context, order),
+                  ),
                 );
               },
             )
-                : Center(
-              child: Text(
-                'No orders found.',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
+          else
+            const Text('No orders found.',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        ],
       ),
     );
+  }
+
+
+  void _showOrderDetailsModal(BuildContext context, Order order) {
+    showDialog(
+      context: context,
+      builder: (_) =>
+          AlertDialog(
+            title: Text('Order Details - ${order.orderId}'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                ...order.dishes.map((dish) {
+                  final dishPrice = _getItemPrice(dish);
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 4),
+                    child: Text('$dish - ₱${dishPrice.toStringAsFixed(2)}'),
+                  );
+                }).toList(),
+                const Divider(),
+                Text('Total: ₱${order.amount.toStringAsFixed(2)}',
+                    style: const TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
+            actions: [
+              TextButton(onPressed: () => Navigator.pop(context),
+                  child: const Text('Close')),
+            ],
+          ),
+    );
+  }
+
+  double _getItemPrice(String itemName) {
+    double price = 0.0;
+    final dish = dishes.firstWhere((d) => d['name'] == itemName,
+        orElse: () => {});
+    if (dish.isNotEmpty) {
+      price = double.tryParse(dish['price']?.substring(1) ?? '0') ?? 0.0;
+    } else {
+      final bilaoItem = bilao.firstWhere((b) => b['name'] == itemName,
+          orElse: () => {});
+      if (bilaoItem.isNotEmpty) {
+        price = double.tryParse(bilaoItem['price']?.substring(1) ?? '0') ?? 0.0;
+      } else {
+        final dessertItem = desserts.firstWhere((d) => d['name'] == itemName,
+            orElse: () => {});
+        if (dessertItem.isNotEmpty) {
+          price =
+              double.tryParse(dessertItem['price']?.substring(1) ?? '0') ?? 0.0;
+        }
+      }
+    }
+    return price;
   }
 
   // Helper method to build individual order cards
@@ -52,7 +110,7 @@ class OrderHistory extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Colors.blue,
         borderRadius: BorderRadius.circular(12),
         boxShadow: const [
           BoxShadow(

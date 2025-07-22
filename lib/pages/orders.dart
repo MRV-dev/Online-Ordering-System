@@ -4,6 +4,23 @@ import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 import 'dart:async';
 
+ValueNotifier<bool> isFoodReadyNotifier = ValueNotifier(false);
+Map<String, ValueNotifier<bool>> orderReadinessMap = {};
+
+void startFoodReadinessTimer(String orderId) {
+  orderReadinessMap[orderId] = ValueNotifier<bool>(false);
+
+  Future.delayed(Duration(seconds: 15), () {
+    final notifier = orderReadinessMap[orderId];
+    if (notifier != null) {
+      notifier.value = true;
+    }
+  });
+}
+
+
+
+
 class Orders extends StatefulWidget {
   const Orders({super.key});
 
@@ -21,6 +38,11 @@ class _OrdersState extends State<Orders> {
   late Order _currentOrder;
   bool isCompleteButtonEnabled = false;
   bool isPickupCompleteButtonEnabled = false;
+  bool isPickupReady = false;
+  bool isPickupInProcess = false;
+
+
+
 
   @override
   void initState() {
@@ -64,7 +86,6 @@ class _OrdersState extends State<Orders> {
   }
 
 
-  // Helper method to build individual order cards
   Widget _buildOrderCard(Order order, BuildContext context) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -83,53 +104,51 @@ class _OrdersState extends State<Orders> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Order ID
+
           Text('Order ID: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
-          // Order Method
+
           Text('Order Method: ${order.orderMethod}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          // Order Placed
+
           Text('Order Placed: ${order.orderPlaced}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          // Amount
+
           Text('Amount: ₱${order.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          // Display Delivery Time if available
+
           if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty)
             Text('Delivery Time: ${order.deliveryTime}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
-          // Row with action buttons: Track Order and View Order
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               // Track Order Button
               IconButton(
                 icon: const Icon(FontAwesomeIcons.eye),
-                onPressed: () => _showTrackOrderDialog(context, order, _updateOrders),
+                onPressed: () {
+                  if (order.orderMethod == "Pick Up") {
+                    _showPickupDialog(context, order);
+                  } else{
+                    _showTrackOrderDialog(context, order, _updateOrders);
+                    }
+                  } ,
                 iconSize: 18,
               ),
-// View Order Icon
+              // View Order Icon
               IconButton(
                 icon: const Icon(FontAwesomeIcons.receipt),
                 onPressed: () {
-                  // Check if the order method is "Pickup"
-                  if (order.orderMethod == "Pickup") {
-                    // Call the Pickup dialog for this order
-                    _showPickupDialog(context, order);
-                  } else {
-                    // Otherwise, show the regular order details dialog
-                    _showViewOrderDialog(context, order);
-                  }
+                  _showViewOrderDialog(context, order);
                 },
               ),
-
             ],
           ),
         ],
       ),
     );
   }
+
 
   // Track Order Dialog
   void _startTimerForOrder() {
@@ -150,23 +169,21 @@ class _OrdersState extends State<Orders> {
         });
       }
 
-      // After all steps are completed, enable the "Complete" button
+
       if (_secondsElapsed == 20) {
         setState(() {
-          isCompleteButtonEnabled = true; // Enable the "Complete" button
-          isPickupCompleteButtonEnabled = true; // Enable the Pickup button
+          isCompleteButtonEnabled = true;
         });
       }
-
       _secondsElapsed++;
     });
   }
 
-  // Update the orders list after completion
   void _updateOrders(Order order) {
     setState(() {
-      orders.remove(order);  // Remove the order from the orders list
-      orderHistory.add(order);  // Add the order to the order history
+      orders.remove(order);
+      orderHistory.add(order);
+      orderReadinessMap.remove(order.orderId);
     });
   }
 
@@ -246,29 +263,15 @@ class _OrdersState extends State<Orders> {
                 ElevatedButton(
                   onPressed: isCompleteButtonEnabled
                       ? () {
-                    // When "Complete" button is pressed, move the order to history
+
                     _updateOrders(order);
                     Navigator.pop(context); // Close the dialog
                   }
-                      : null, // Make the button disabled if not yet completed
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isCompleteButtonEnabled ? Colors.green : Colors.grey,
                   ),
                   child: const Text("Complete", style: TextStyle(color: Colors.white)),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: isPickupCompleteButtonEnabled
-                      ? () {
-                    // Move to history and remove from current list
-                    _updateOrders(order);
-                    Navigator.pop(context); // Close the dialog
-                  }
-                      : null, // Make the button disabled if not yet processed
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isPickupCompleteButtonEnabled ? Colors.green : Colors.grey,
-                  ),
-                  child: const Text("Pickup Complete", style: TextStyle(color: Colors.white)),
                 ),
               ],
             );
@@ -277,7 +280,7 @@ class _OrdersState extends State<Orders> {
         actions: [
           TextButton(
             onPressed: () {
-              Navigator.pop(context); // Close the dialog
+              Navigator.pop(context);
             },
             child: const Text("Close"),
           ),
@@ -287,42 +290,41 @@ class _OrdersState extends State<Orders> {
   }
 
 
-  void _showPickupDialog(BuildContext context, Order order) {
-    bool isFoodReady = false; // Track whether the food is ready for pickup
 
-    // Show the dialog
+  void _showPickupDialog(BuildContext context, Order order) {
+    // Make sure the readiness notifier exists for this order
+    final readinessNotifier = orderReadinessMap[order.orderId];
+
+    if (readinessNotifier == null) {
+      // If not already started, start the timer
+      startFoodReadinessTimer(order.orderId);
+    }
+
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text("Pickup Order", style: TextStyle(fontWeight: FontWeight.bold)),
-        content: StatefulBuilder(
-          builder: (context, setState) {
-            // Start the process when the dialog is opened
-            Future.delayed(Duration(seconds: 4), () {
-              setState(() {
-                isFoodReady = true; // Change the status after 4 seconds
-              });
-            });
-
+        content: ValueListenableBuilder<bool>(
+          valueListenable: orderReadinessMap[order.orderId]!,
+          builder: (context, isFoodReady, _) {
             return Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(isFoodReady
-                    ? "Your food is ready for pickup" // Updated message when food is ready
-                    : "Your food is still in process"), // Initial message
+                    ? "Your food is ready for pickup"
+                    : "Your food is still in process"),
                 const SizedBox(height: 20),
                 ElevatedButton(
                   onPressed: isFoodReady
                       ? () {
-                    // When food is ready, move it to history and remove from current orders
                     _updateOrders(order);
-                    Navigator.pop(context); // Close the dialog
+                    Navigator.pop(context);
                   }
-                      : null, // Disable button if food is not ready yet
+                      : null,
                   child: const Text("Pickup Complete"),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isFoodReady ? Colors.green : Colors.grey, // Change color based on status
+                    backgroundColor: isFoodReady ? Colors.green : Colors.grey,
                   ),
                 ),
               ],
@@ -332,6 +334,12 @@ class _OrdersState extends State<Orders> {
       ),
     );
   }
+
+
+
+
+
+
 
 
 
