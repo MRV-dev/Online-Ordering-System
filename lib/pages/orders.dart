@@ -3,9 +3,13 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 import 'dart:async';
+import 'package:collection/collection.dart';
+
 
 ValueNotifier<bool> isFoodReadyNotifier = ValueNotifier(false);
 Map<String, ValueNotifier<bool>> orderReadinessMap = {};
+Map<String, ValueNotifier<int>> deliveryProgressMap = {};
+Map<String, Timer> deliveryTimers = {};
 
 void startFoodReadinessTimer(String orderId) {
   orderReadinessMap[orderId] = ValueNotifier<bool>(false);
@@ -18,7 +22,32 @@ void startFoodReadinessTimer(String orderId) {
   });
 }
 
+void startDeliveryTimer(String orderId) {
+  if (deliveryProgressMap.containsKey(orderId)) return; // Timer already running
 
+  final notifier = ValueNotifier<int>(0);
+  deliveryProgressMap[orderId] = notifier;
+
+  Timer timer = Timer.periodic(Duration(seconds: 15), (timer) {
+    final currentProgress = notifier.value;
+    if (currentProgress >= 2) {
+      timer.cancel();
+      deliveryTimers.remove(orderId);
+
+
+      final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
+      if (orderToRemove != null) {
+        orders.remove(orderToRemove);
+        orderHistory.add(orderToRemove);
+        deliveryProgressMap.remove(orderId);
+      }
+    } else {
+      notifier.value = currentProgress + 1;
+    }
+  });
+
+  deliveryTimers[orderId] = timer;
+}
 
 
 class Orders extends StatefulWidget {
@@ -30,24 +59,24 @@ class Orders extends StatefulWidget {
 
 class _OrdersState extends State<Orders> {
 
-  Timer? _timer;
-  int _secondsElapsed = 0;
   bool isPlacedGreen = false;
   bool isInProcessGreen = false;
   bool isCompletedGreen = false;
-  late Order _currentOrder;
   bool isCompleteButtonEnabled = false;
   bool isPickupCompleteButtonEnabled = false;
   bool isPickupReady = false;
   bool isPickupInProcess = false;
 
 
-
-
   @override
   void initState() {
     super.initState();
-    _startTimerForOrder();
+
+    for (var order in orders) {
+      if (order.orderMethod == "Delivery") {
+        startDeliveryTimer(order.orderId);
+      }
+    }
   }
 
   @override
@@ -150,35 +179,6 @@ class _OrdersState extends State<Orders> {
   }
 
 
-  // Track Order Dialog
-  void _startTimerForOrder() {
-    _timer = Timer.periodic(Duration(seconds: 1), (timer) {
-      if (_secondsElapsed == 5 && !isPlacedGreen) {
-        setState(() {
-          isPlacedGreen = true;
-        });
-      }
-      if (_secondsElapsed == 10 && !isInProcessGreen) {
-        setState(() {
-          isInProcessGreen = true;
-        });
-      }
-      if (_secondsElapsed == 15 && !isCompletedGreen) {
-        setState(() {
-          isCompletedGreen = true;
-        });
-      }
-
-
-      if (_secondsElapsed == 20) {
-        setState(() {
-          isCompleteButtonEnabled = true;
-        });
-      }
-      _secondsElapsed++;
-    });
-  }
-
   void _updateOrders(Order order) {
     setState(() {
       orders.remove(order);
@@ -187,107 +187,118 @@ class _OrdersState extends State<Orders> {
     });
   }
 
-  // Show the Track Order Dialog and update order states
   void _showTrackOrderDialog(BuildContext context, Order order, void Function(Order order) updateOrders) {
-    setState(() {
-      _currentOrder = order;
-    });
+    final deliveryProgressNotifier = deliveryProgressMap[order.orderId];
 
-    // Start the timer only once, outside the dialog
-    if (_secondsElapsed == 0) {
-      _startTimerForOrder(); // Start the timer when the dialog is shown
+    if (deliveryProgressNotifier == null) {
+      startDeliveryTimer(order.orderId);
     }
 
     showDialog(
       context: context,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text("Track Order", style: TextStyle(fontWeight: FontWeight.bold)),
-        content: StatefulBuilder(
-          builder: (context, setState) {
-            return Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Icon(
-                          FontAwesomeIcons.circle,
-                          color: isPlacedGreen ? Colors.green : Colors.grey,
-                        ),
-                        SizedBox(height: 8),
-                        Icon(
-                          FontAwesomeIcons.circle,
-                          color: isInProcessGreen ? Colors.green : Colors.grey,
-                        ),
-                        SizedBox(height: 8),
-                        Icon(
-                          FontAwesomeIcons.circle,
-                          color: isCompletedGreen ? Colors.green : Colors.grey,
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+      barrierDismissible: false,
+      builder: (context) {
+        return ValueListenableBuilder<int>(
+          valueListenable: deliveryProgressMap[order.orderId] ?? ValueNotifier(0),
+          builder: (context, progress, _) {
+            bool isPlacedGreen = progress >= 0;
+            bool isInProcessGreen = progress >= 1;
+            bool isCompletedGreen = progress >= 2;
+            bool showDeliveredMessage = isCompletedGreen;
+
+            // When completed, auto close the dialog & remove order after a short delay
+            if (isCompletedGreen) {
+              Future.delayed(Duration(seconds: 3), () {
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context); // close dialog
+                }
+                _updateOrders(order); // remove order from list
+                deliveryProgressMap.remove(order.orderId);
+              });
+            }
+
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              title: const Text("Track Order", style: TextStyle(fontWeight: FontWeight.bold)),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
                         children: [
-                          Text("Order Placed", style: TextStyle(fontWeight: FontWeight.w500)),
-                          SizedBox(height: 15),
-                          Text("In Process", style: TextStyle(fontWeight: FontWeight.w500)),
-                          SizedBox(height: 15),
-                          Text("Completed", style: TextStyle(fontWeight: FontWeight.w500)),
+                          Icon(FontAwesomeIcons.circle, color: isPlacedGreen ? Colors.green : Colors.grey),
+                          SizedBox(height: 8),
+                          Icon(FontAwesomeIcons.circle, color: isInProcessGreen ? Colors.green : Colors.grey),
+                          SizedBox(height: 8),
+                          Icon(FontAwesomeIcons.circle, color: isCompletedGreen ? Colors.green : Colors.grey),
+                        ],
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Order Placed", style: TextStyle(fontWeight: FontWeight.w500)),
+                            SizedBox(height: 15),
+                            Text("In Process", style: TextStyle(fontWeight: FontWeight.w500)),
+                            SizedBox(height: 15),
+                            Text("Completed", style: TextStyle(fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                  if (showDeliveredMessage)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.info_outline, color: Colors.grey),
+                          SizedBox(width: 10),
+                          Expanded(child: Text("Your order has been delivered")),
                         ],
                       ),
                     ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade200,
-                    borderRadius: BorderRadius.circular(8),
+                  if (!showDeliveredMessage)
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade200,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Row(
+                        children: const [
+                          Icon(Icons.info_outline, color: Colors.grey),
+                          SizedBox(width: 10),
+                          Expanded(child: Text("Your order is being processed")),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+              actions: [
+                if (!showDeliveredMessage)
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text("Close"),
                   ),
-                  child: Row(
-                    children: const [
-                      Icon(Icons.info_outline, color: Colors.grey),
-                      SizedBox(width: 10),
-                      Expanded(child: Text("Your order has been completed")),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 20),
-                ElevatedButton(
-                  onPressed: isCompleteButtonEnabled
-                      ? () {
-
-                    _updateOrders(order);
-                    Navigator.pop(context); // Close the dialog
-                  }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: isCompleteButtonEnabled ? Colors.green : Colors.grey,
-                  ),
-                  child: const Text("Complete", style: TextStyle(color: Colors.white)),
-                ),
               ],
             );
           },
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            child: const Text("Close"),
-          ),
-        ],
-      ),
+        );
+      },
     );
   }
+
 
 
 

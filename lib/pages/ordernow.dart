@@ -8,7 +8,6 @@ import 'order_history.dart';
 import 'orders.dart';
 
 
-
 class Ordernow extends StatefulWidget {
   const Ordernow({super.key});
 
@@ -701,6 +700,11 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     deliveryTime: selectedTime,
                                   );
 
+
+                                  if (order.orderMethod == "Delivery") {
+                                    startDeliveryTimer(order.orderId);
+                                  }
+
                                   startFoodReadinessTimer(order.orderId);
 
                                   // Close the modal
@@ -716,25 +720,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
 
 
                                   orders.add(order);
-                                  // Show order placed modal
                                   _showOrderPlacedModal(context);
 
-
-                                  Future.delayed(Duration(seconds: 10), () {
-                                    setState(() {
-                                      order.status = 'Delivered';
-
-                                      orders.remove(order);
-                                      orderHistory.add(order);
-                                    });
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => OrderHistory(orders: orderHistory),
-                                      ),
-                                    );
-                                  });
                                 } else {
                                   _showCustomSnackBar('Please add items to your order.');
                                 }
@@ -763,6 +750,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
       },
     );
   }
+
 
   String _generateOrderId() {
     final randomNumber = DateTime.now().millisecondsSinceEpoch % 100000;  // Generate a random number with max 5 digits
