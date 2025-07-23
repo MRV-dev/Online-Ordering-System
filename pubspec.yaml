@@ -40,6 +40,7 @@ dependencies:
   shared_preferences: ^2.2.2
   collection: ^1.17.0
   intl: ^0.17.0
+  flutter_spinkit: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -86,6 +87,7 @@ flutter:
   - assets/images/bihon.png
   - assets/images/siomaisilog.png
   - assets/images/siomai-rice.png
+
 
 
   #uses-material-design: true

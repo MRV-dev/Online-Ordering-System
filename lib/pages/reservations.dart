@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 
-
-
 class ReservationsPage extends StatefulWidget {
   const ReservationsPage({super.key});
 
@@ -30,9 +28,7 @@ class _ReservationsPageState extends State<ReservationsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Reservations'),
-      ),
+      backgroundColor: const Color(0xFFF5F5F5),
       body: _buildOrderList(reservations),
     );
   }
@@ -48,7 +44,7 @@ class _ReservationsPageState extends State<ReservationsPage>
     );
   }
 
-  // Function to display the order card
+  // card
   Widget _buildOrderCard(Order order) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -67,7 +63,7 @@ class _ReservationsPageState extends State<ReservationsPage>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('Order ID: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text('Reservation ID: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 8),
           Text('Order Method: ${order.orderMethod}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
@@ -76,7 +72,7 @@ class _ReservationsPageState extends State<ReservationsPage>
           Text('Amount: ₱${order.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
           if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty)
-            Text('Delivery Time: ${order.deliveryTime}', style: const TextStyle(fontSize: 14)),
+            Text('Scheculed Time: ${order.deliveryTime}', style: const TextStyle(fontSize: 14)),
         ],
       ),
     );

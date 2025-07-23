@@ -92,7 +92,7 @@ class Landingpage extends StatelessWidget {
                           ),
                           textAlign: TextAlign.center,
                         ),
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 46),
                         ElevatedButton(
                           onPressed: () {
                             Navigator.pushNamed(context, '/OrderNow');
@@ -107,10 +107,10 @@ class Landingpage extends StatelessWidget {
                           ),
                           child: const Text(
                             'Order Now',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                           ),
                         ),
-                        const SizedBox(height: 70),
+                        const SizedBox(height: 50),
                         SizedBox(
                           height: 320,
                           child: PageView(
@@ -580,7 +580,13 @@ class FoodItem extends StatelessWidget {
           ),
           SizedBox(height: 10),
           ElevatedButton(
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/OrderNow');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFFFD766),
+              foregroundColor: Colors.black,
+            ),
             child: Text('Order Now'),
           ),
         ],

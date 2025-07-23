@@ -86,8 +86,8 @@ class _ChangePasswordState extends State<ChangePassword> {
 
 
               const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
+              Padding(
+                padding: EdgeInsets.only(left: 10),
                 child: ElevatedButton(
                   onPressed: () {
                     if (_formKey.currentState!.validate()) {
@@ -99,7 +99,7 @@ class _ChangePasswordState extends State<ChangePassword> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF3C95E),
-                    padding: const EdgeInsets.symmetric(vertical: 15),
+                    padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 148),
                   ),
                   child: const Text(
                       'Submit', style: TextStyle(color: Colors.black)),

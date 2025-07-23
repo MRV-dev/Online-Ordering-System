@@ -3,7 +3,7 @@ import 'package:online_ordering_system/models/orderhistorymodel.dart';
 import '../globals.dart';
 
 class OrderHistory extends StatelessWidget {
-  OrderHistory({super.key, required List<Order> orders});
+  OrderHistory({super.key, required List<Order> orders, required List<Order> pickUpOrders});
 
   final List<Order> orders = orderHistory;
 
@@ -33,7 +33,13 @@ class OrderHistory extends StatelessWidget {
                       children: [
                         Text('Method: ${_getOrderMethod(order)}'),
                         Text('Amount: ₱${order.amount.toStringAsFixed(2)}'),
-                        Text('Status: ${order.status}'),
+                        Row(
+                          children: [
+                            Text('Status: '),
+                            Text('Processed', style: TextStyle(color: Colors.green),),
+                          ],
+                        ),
+
                         Text('Placed: ${order.orderPlaced}'),
                       ],
                     ),

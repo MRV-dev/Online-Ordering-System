@@ -139,7 +139,7 @@ class _AccountState extends State<Account> {
               ],
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 8),
           Expanded(
             child: PageView(
               controller: _pageController,
@@ -153,7 +153,7 @@ class _AccountState extends State<Account> {
                 const ChangePassword(),
                 const Orders(),
                 ReservationsPage(),
-                OrderHistory(orders: [],),
+                OrderHistory(orders: [], pickUpOrders: [],),
               ],
             ),
           ),
@@ -188,11 +188,6 @@ class _AccountState extends State<Account> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          const Align(
-            alignment: Alignment.centerLeft,
-            child: Text('Profile',
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
-          ),
           GestureDetector(
             onTap: isEditing ? _pickProfileImage : null,
             child: CircleAvatar(
@@ -211,7 +206,7 @@ class _AccountState extends State<Account> {
               style: const TextStyle(
                   fontSize: 20, fontWeight: FontWeight.bold)),
           const SizedBox(height: 5),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           ElevatedButton(
             onPressed: () {
               setState(() {
@@ -227,7 +222,7 @@ class _AccountState extends State<Account> {
             ),
             child: Text(isEditing ? 'Done' : 'Edit Profile'),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
           _profileField('Name', nameController),
           _profileField('Email', emailController),
           _profileField('Address', addressController),

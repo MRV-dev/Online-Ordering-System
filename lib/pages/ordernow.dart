@@ -592,11 +592,19 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               });
                             },
                           )
-                              : TextField(
+                              : deliveryOption == 'Pick Up'
+                          ? TextField(
                             controller: addressController,
                             decoration: InputDecoration(
                               labelText: deliveryOption == 'Pick Up' ? 'Pick Up Location' : 'Delivery Address',
                               border: const OutlineInputBorder(),
+                            ),
+                          )
+                              : TextField(
+                            controller: addressController,
+                            decoration: const InputDecoration(
+                              labelText: 'Delivery Address',  // Address for Delivery
+                              border: OutlineInputBorder(),
                             ),
                           ),
                           const SizedBox(height: 16),
@@ -628,7 +636,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.start,
                             children: [
-                              if (deliveryOption == 'Delivery')
+                              if (deliveryOption == 'Delivery' || deliveryOption == 'Pick Up' || deliveryOption == 'Reservation')
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -727,14 +735,19 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                   );
 
 
-                                  if (order.orderMethod == 'Delivery') {
-                                    if (!orders.contains(order)) {
-                                      orders.add(order);
+                                  if (order.orderMethod == 'Delivery' || order.orderMethod == 'Pick Up') {
+                                    if (order.orderMethod == 'Delivery') {
+                                      if (!orders.contains(order)) {
+                                        orders.add(order);  // Add to orders list
+                                      }
+                                    } else if (order.orderMethod == 'Pick Up') {
+                                      if (!pickUpOrders.contains(order)) {
+                                        pickUpOrders.add(order);  // Add to pick up orders list
+                                      }
                                     }
                                   } else if (order.orderMethod == 'Reservation') {
-                                    if (!reservations.contains(order)) {
-                                      reservations.add(order);
-                                    }
+
+                                    reservations.add(order);
                                   }
 
                                   startFoodReadinessTimer(order.orderId);
@@ -747,6 +760,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     quantities.forEach((key, value) {
                                       quantities[key] = 0;
                                     });
+                                    _image = null;
                                   });
 
                                   _showOrderPlacedModal(context);
@@ -764,9 +778,10 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) => OrderHistory(orders: orderHistory),
+                                        builder: (context) => OrderHistory(orders: orderHistory, pickUpOrders: pickUpOrders),
                                       ),
                                     );
+
                                   });
                                 } else {
                                   _showCustomSnackBar('Please add items to your order.');

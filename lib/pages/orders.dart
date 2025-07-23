@@ -92,22 +92,28 @@ class _OrdersState extends State<Orders> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            orders.isNotEmpty
-                ? ListView.builder(
+            // Filter out reservation orders from the list
+            ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: orders.length,
+              itemCount: orders.where((order) => order.orderMethod != 'Reservation').length +
+                  pickUpOrders.length, // We are only counting non-reservation orders
               itemBuilder: (context, index) {
-                final order = orders[index];
+                // Get the order and display it
+                Order order;
+                if (index < orders.where((order) => order.orderMethod != 'Reservation').length) {
+                  order = orders.where((order) => order.orderMethod != 'Reservation').toList()[index];
+                } else {
+                  order = pickUpOrders[index - orders.where((order) => order.orderMethod != 'Reservation').length];
+                }
+
                 return _buildOrderCard(order, context);
               },
-            )
-                : Center(
-              child: Text(
-                'No orders found.',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
             ),
+            // Display a message if no orders are found
+            orders.isEmpty && pickUpOrders.isEmpty
+                ? Center(child: Text('No orders found.'))
+                : SizedBox.shrink(),
           ],
         ),
       ),
@@ -146,7 +152,9 @@ class _OrdersState extends State<Orders> {
           Text('Amount: ₱${order.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
 
-          if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty)
+          if (order.orderMethod == "Pick Up")
+            Text('Scheduled Pickup: ${order.deliveryTime}', style: const TextStyle(fontSize: 14))
+          else if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty)
             Text('Delivery Time: ${order.deliveryTime}', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
           Row(
@@ -164,7 +172,6 @@ class _OrdersState extends State<Orders> {
                   } ,
                 iconSize: 18,
               ),
-              // View Order Icon
               IconButton(
                 icon: const Icon(FontAwesomeIcons.receipt),
                 onPressed: () {
@@ -308,7 +315,6 @@ class _OrdersState extends State<Orders> {
 
 
   void _showPickupDialog(BuildContext context, Order order) {
-    // Make sure the readiness notifier exists for this order
     final readinessNotifier = orderReadinessMap[order.orderId];
 
     if (readinessNotifier == null) {
@@ -334,7 +340,10 @@ class _OrdersState extends State<Orders> {
                 ElevatedButton(
                   onPressed: isFoodReady
                       ? () {
-                    _updateOrders(order);
+                    setState(() {
+                      pickUpOrders.remove(order); // Remove from active orders
+                      orderHistory.add(order);
+                    });
                     Navigator.pop(context);
                   }
                       : null,
