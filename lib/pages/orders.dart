@@ -23,7 +23,7 @@ void startFoodReadinessTimer(String orderId) {
 }
 
 void startDeliveryTimer(String orderId) {
-  if (deliveryProgressMap.containsKey(orderId)) return; // Timer already running
+  if (deliveryProgressMap.containsKey(orderId)) return;
 
   final notifier = ValueNotifier<int>(0);
   deliveryProgressMap[orderId] = notifier;
@@ -181,11 +181,15 @@ class _OrdersState extends State<Orders> {
 
   void _updateOrders(Order order) {
     setState(() {
-      orders.remove(order);
-      orderHistory.add(order);
-      orderReadinessMap.remove(order.orderId);
+      if (order.orderMethod == "Reservation") {
+        reservations.remove(order);  // Remove the order from reservations list
+      } else {
+        orders.remove(order);  // Remove the order from orders list
+      }
+      orderHistory.add(order);  // Add to order history list
     });
   }
+
 
   void _showTrackOrderDialog(BuildContext context, Order order, void Function(Order order) updateOrders) {
     final deliveryProgressNotifier = deliveryProgressMap[order.orderId];
@@ -212,7 +216,7 @@ class _OrdersState extends State<Orders> {
                 if (Navigator.canPop(context)) {
                   Navigator.pop(context); // close dialog
                 }
-                _updateOrders(order); // remove order from list
+                updateOrders(order); // Call updateOrders to update the order list
                 deliveryProgressMap.remove(order.orderId);
               });
             }
@@ -298,6 +302,7 @@ class _OrdersState extends State<Orders> {
       },
     );
   }
+
 
 
 

@@ -39,6 +39,7 @@ dependencies:
   file_picker: 5.2.11
   shared_preferences: ^2.2.2
   collection: ^1.17.0
+  intl: ^0.17.0
 
 dev_dependencies:
   flutter_test:
@@ -70,16 +71,21 @@ flutter:
   - assets/images/Dessert.png
   - assets/images/Pancit_Canton_Bihon_Guisado.png
   - assets/images/Spaghetti.png
+  - assets/images/Spaghetti_bilao.png
   - assets/images/sweet_and_spicy.png
   - assets/images/plain.png
   - assets/images/tapsilog.png
   - assets/images/hotsilog.png
   - assets/images/chami_bilao.png
   - assets/images/palabok_bilao.png
+  - assets/images/Pancit_bilao.png
   - assets/images/gcash.jpg
   - assets/images/Graham.png
   - assets/images/graham-bar.png
   - assets/images/leche-flan.png
+  - assets/images/bihon.png
+  - assets/images/siomaisilog.png
+  - assets/images/siomai-rice.png
 
 
   #uses-material-design: true

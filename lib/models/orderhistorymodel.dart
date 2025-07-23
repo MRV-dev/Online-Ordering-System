@@ -1,6 +1,6 @@
 class Order {
   final String orderId;
-  final String orderMethod;
+  late final String orderMethod;
   final String orderPlaced;
   final double amount;
   late final String status;

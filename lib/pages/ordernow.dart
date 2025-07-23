@@ -50,7 +50,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     'Bihon': 0,
     'Tapsilog': 0,
     'Hotsilog': 0,
-    'Siomaisilog': 0,
+    'Siomai Silog': 0,
     'Siomai Rice': 0,
     'Pancit Bilao': 0,
     'Spaghetti Bilao': 0,
@@ -69,7 +69,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     {'name': 'Bihon', 'price': '₱90.00', 'image': 'assets/images/bihon.png'},
     {'name': 'Tapsilog', 'price': '₱95.00', 'image': 'assets/images/tapsilog.png'},
     {'name': 'Hotsilog', 'price': '₱75.00', 'image': 'assets/images/hotsilog.png'},
-    {'name': 'Siomaisilog', 'price': '₱70.00', 'image': 'assets/images/siomaisilog.png'},
+    {'name': 'Siomai Silog', 'price': '₱70.00', 'image': 'assets/images/siomaisilog.png'},
     {'name': 'Siomai Rice', 'price': '₱55.00', 'image': 'assets/images/siomai-rice.png'},
   ];
 
@@ -81,7 +81,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
   ];
 
   final List<Map<String, String>> desserts = [
-    {'name': 'Graham', 'price': '₱75.00', 'image': 'assets/images/graham.png'},
+    {'name': 'Graham', 'price': '₱75.00', 'image': 'assets/images/Graham.png'},
     {'name': 'Leche Plan', 'price': '₱100.00', 'image': 'assets/images/leche-flan.png'},
     {'name': 'Graham Bar', 'price': '₱25.00', 'image': 'assets/images/graham-bar.png'},
     {'name': 'Maja Blanca', 'price': '₱100.00', 'image': 'assets/images/maja.jpg'},
@@ -495,7 +495,10 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     final phoneController = TextEditingController();
     final addressController = TextEditingController();
     TextEditingController timeController = TextEditingController();
+    TextEditingController dateController = TextEditingController();
     String selectedTime = '';
+    int numberOfPeople = 1;
+
 
     Future<void> _selectTime(BuildContext context) async {
       final TimeOfDay? picked = await showTimePicker(
@@ -510,8 +513,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
         });
       }
     }
-
-
 
     showDialog(
       context: context,
@@ -538,22 +539,26 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                         crossAxisAlignment: CrossAxisAlignment.center,
                         children: [
                           Container(
-                            padding: EdgeInsets.symmetric(horizontal: 70, vertical: 13),
-                            margin: EdgeInsets.only(bottom: 24),
+                            padding: const EdgeInsets.symmetric(horizontal: 70, vertical: 13),
+                            margin: const EdgeInsets.only(bottom: 24),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(30),
                               border: Border.all(color: Colors.black26),
-                              color: Color(0xFFEFCA6C),
+                              color: const Color(0xFFEFCA6C),
                             ),
-                            child: const Text(
-                              'Delivery',
-                              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                            child: Text(
+                              deliveryOption == 'Reservation'
+                                  ? 'Reservation'
+                                  : deliveryOption == 'Pick Up'
+                                  ? 'Pick Up'
+                                  : 'Delivery',
+                              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
                           // Full Name
                           TextField(
                             controller: fullNameController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Full Name',
                               border: OutlineInputBorder(),
                             ),
@@ -562,38 +567,61 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                           // Phone Number
                           TextField(
                             controller: phoneController,
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText: 'Phone Number',
                               border: OutlineInputBorder(),
                             ),
                             keyboardType: TextInputType.phone,
                           ),
                           const SizedBox(height: 16),
-                          // Delivery Address
-                          TextField(
+                          // Address Field for Pick Up and Delivery
+                          deliveryOption == 'Reservation'
+                              ? TextField(
+                            controller: addressController,
+                            decoration: const InputDecoration(
+                              labelText: 'How many people are going?',
+                              border: OutlineInputBorder(),
+                            ),
+                            keyboardType: TextInputType.number,
+                            onChanged: (value) {
+                              setState(() {
+                                int newValue = int.tryParse(value) ?? 0;
+                                numberOfPeople = newValue > 15 ? 15 : newValue;
+                                addressController.text = numberOfPeople.toString();
+                                addressController.selection = TextSelection.collapsed(offset: addressController.text.length);
+                              });
+                            },
+                          )
+                              : TextField(
                             controller: addressController,
                             decoration: InputDecoration(
-                              labelText: 'Delivery Address',
-                              border: OutlineInputBorder(),
+                              labelText: deliveryOption == 'Pick Up' ? 'Pick Up Location' : 'Delivery Address',
+                              border: const OutlineInputBorder(),
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Delivery Time Picker
+                          // Time Picker
                           GestureDetector(
                             onTap: () => _selectTime(context),
                             child: AbsorbPointer(
                               child: TextField(
                                 controller: timeController,
                                 decoration: InputDecoration(
-                                  labelText: selectedTime.isEmpty ? 'Select Delivery Time' : selectedTime,  // Show time or default message
-                                  border: OutlineInputBorder(),
+                                  labelText: deliveryOption == 'Pick Up'
+                                      ? 'Set Pick Up Time'
+                                      : deliveryOption == 'Reservation'
+                                      ? 'Set Time'
+                                      : selectedTime.isEmpty
+                                      ? 'Select Delivery Time'
+                                      : selectedTime,
+                                  border: const OutlineInputBorder(),
                                 ),
                               ),
                             ),
                           ),
                           const SizedBox(height: 16),
                           // Payment method selection
-                          Text(
+                          const Text(
                             'Scan GCASH QR Code',
                             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                           ),
@@ -631,7 +659,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                       child: const Text('Upload Payment', style: TextStyle(fontSize: 12.5, color: Colors.black)),
                                     ),
                                     const SizedBox(height: 10),
-                                    // Display the selected image
                                     if (_image != null)
                                       Image.file(
                                         _image!,
@@ -656,7 +683,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                 showDialog(
                                   context: context,
                                   builder: (_) => AlertDialog(
-                                    title: const Text('Missing Information'),
                                     content: const Text('Please fill in all the fields before proceeding.'),
                                     actions: [
                                       TextButton(
@@ -701,8 +727,14 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                   );
 
 
-                                  if (order.orderMethod == "Delivery") {
-                                    startDeliveryTimer(order.orderId);
+                                  if (order.orderMethod == 'Delivery') {
+                                    if (!orders.contains(order)) {
+                                      orders.add(order);
+                                    }
+                                  } else if (order.orderMethod == 'Reservation') {
+                                    if (!reservations.contains(order)) {
+                                      reservations.add(order);
+                                    }
                                   }
 
                                   startFoodReadinessTimer(order.orderId);
@@ -713,15 +745,29 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                   // Reset the quantities after placing the order
                                   setState(() {
                                     quantities.forEach((key, value) {
-                                      quantities[key] = 0;  // Reset all items
+                                      quantities[key] = 0;
                                     });
                                   });
 
-
-
-                                  orders.add(order);
                                   _showOrderPlacedModal(context);
 
+                                  Future.delayed(Duration(seconds: 10), () {
+                                    setState(() {
+                                      order.status = 'Delivered';
+
+                                      if (order.orderMethod != 'Reservation') {
+                                        orders.remove(order);
+                                      }
+                                      orderHistory.add(order);
+                                    });
+
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => OrderHistory(orders: orderHistory),
+                                      ),
+                                    );
+                                  });
                                 } else {
                                   _showCustomSnackBar('Please add items to your order.');
                                 }

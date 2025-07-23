@@ -3,6 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:online_ordering_system/pages/password.dart';
 import 'dart:io';
 import 'package:image_picker/image_picker.dart';
+import 'reservations.dart';
 import 'order_history.dart';
 import 'orders.dart';
 
@@ -133,7 +134,8 @@ class _AccountState extends State<Account> {
                 _buildToggleButton('Profile', 0),
                 _buildToggleButton('Password', 1),
                 _buildToggleButton('Orders', 2),
-                _buildToggleButton('Order History', 3),
+                _buildToggleButton('Reservations', 3),
+                _buildToggleButton('Order History', 4),
               ],
             ),
           ),
@@ -150,6 +152,7 @@ class _AccountState extends State<Account> {
                 _buildProfileSection(),
                 const ChangePassword(),
                 const Orders(),
+                ReservationsPage(),
                 OrderHistory(orders: [],),
               ],
             ),

@@ -31,7 +31,7 @@ class OrderHistory extends StatelessWidget {
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Method: ${order.orderMethod}'),
+                        Text('Method: ${_getOrderMethod(order)}'),
                         Text('Amount: ₱${order.amount.toStringAsFixed(2)}'),
                         Text('Status: ${order.status}'),
                         Text('Placed: ${order.orderPlaced}'),
@@ -50,6 +50,18 @@ class OrderHistory extends StatelessWidget {
     );
   }
 
+  // Determine order method and display the appropriate text
+  String _getOrderMethod(Order order) {
+    switch (order.orderMethod) {
+      case 'Reservation':
+        return 'Reservation';
+      case 'Pick Up':
+        return 'Pick Up';
+      case 'Delivery':
+      default:
+        return 'Delivery';
+    }
+  }
 
   void _showOrderDetailsModal(BuildContext context, Order order) {
     showDialog(
@@ -127,7 +139,7 @@ class OrderHistory extends StatelessWidget {
           const SizedBox(height: 8),
           Text('Order Method: $orderMethod', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
-          Text('Order Placed: $orderPlaced', style: const TextStyle(fontSize: 14)),
+          Text('Reserved For: $orderPlaced', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 8),
           Text('Amount: $amount', style: const TextStyle(fontSize: 14)),
           const SizedBox(height: 12),
