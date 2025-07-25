@@ -6,6 +6,7 @@ class Order {
   late final String status;
   final List<String> dishes;
   final String? deliveryTime;
+  final String? date;
 
   Order({
     required this.orderId,
@@ -15,5 +16,6 @@ class Order {
     required this.status,
     required this.dishes,
     this.deliveryTime,
+    this.date,
   });
 }

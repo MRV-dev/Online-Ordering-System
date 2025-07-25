@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 
@@ -44,8 +45,56 @@ class _ReservationsPageState extends State<ReservationsPage>
     );
   }
 
-  // card
+
   Widget _buildOrderCard(Order order) {
+    List<Widget> children = [];
+
+    // Display reservation details
+    children.add(Text(
+        'Reservation ID: ${order.orderId}',
+        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
+    ));
+    children.add(const SizedBox(height: 8));
+
+    // Display the order method
+    children.add(Text(
+        'Order Method: ${order.orderMethod}',
+        style: const TextStyle(fontSize: 14)
+    ));
+    children.add(const SizedBox(height: 8));
+
+    // Display the order placed date
+    children.add(Text(
+        'Order Placed: ${order.orderPlaced}',
+        style: const TextStyle(fontSize: 14)
+    ));
+    children.add(const SizedBox(height: 8));
+
+    // Display the amount
+    children.add(Text(
+        'Amount: ₱${order.amount.toStringAsFixed(2)}',
+        style: const TextStyle(fontSize: 14)
+    ));
+    children.add(const SizedBox(height: 8));
+
+    // Display scheduled time if available
+    if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty) {
+      children.add(Text(
+          'Scheduled Time: ${order.deliveryTime}',
+          style: const TextStyle(fontSize: 14)
+      ));
+    }
+    children.add(const SizedBox(height: 8));
+
+    // Display scheduled date if available
+    if (order.date != null && order.date!.isNotEmpty) {
+      children.add(Text(
+          'Scheduled Date: ${order.date}',  // Display the selected date
+          style: const TextStyle(fontSize: 14)
+      ));
+    }
+
+    // Return the Container widget with all the children
     return Container(
       padding: const EdgeInsets.all(16),
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
@@ -62,20 +111,8 @@ class _ReservationsPageState extends State<ReservationsPage>
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Reservation ID: ${order.orderId}', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          Text('Order Method: ${order.orderMethod}', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          Text('Order Placed: ${order.orderPlaced}', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          Text('Amount: ₱${order.amount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty)
-            Text('Scheculed Time: ${order.deliveryTime}', style: const TextStyle(fontSize: 14)),
-        ],
+        children: children,
       ),
     );
   }
 }
-

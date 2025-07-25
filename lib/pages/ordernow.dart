@@ -6,6 +6,8 @@ import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 import 'order_history.dart';
 import 'orders.dart';
+import 'package:intl/intl.dart';
+import 'package:table_calendar/table_calendar.dart';
 
 
 class Ordernow extends StatefulWidget {
@@ -32,6 +34,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
       print("No image selected.");
     }
   }
+
 
   String _formatTime(TimeOfDay time) {
     final int hour = time.hour;
@@ -120,6 +123,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
   }
 
   TextEditingController addressController = TextEditingController();
+
+  set selectedDay(DateTime selectedDay) {}
 
   @override
   Widget build(BuildContext context) {
@@ -497,6 +502,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     TextEditingController timeController = TextEditingController();
     TextEditingController dateController = TextEditingController();
     String selectedTime = '';
+    DateTime selectedDay = DateTime.now();
     int numberOfPeople = 1;
 
 
@@ -513,6 +519,56 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
         });
       }
     }
+
+    Future<void> _selectDate(BuildContext context) async {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15.0), // Rounded corners for the dialog
+            ),
+            elevation: 5, // Shadow for the dialog
+            backgroundColor: Colors.white, // White background for the dialog
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Text(
+                    'Select Date',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.blueAccent),
+                  ),
+                ),
+                Divider(color: Colors.grey, thickness: 1, indent: 20, endIndent: 20),
+                Container(
+                  color: Colors.white,
+                  child: TableCalendar(
+                    focusedDay: selectedDay,
+                    firstDay: DateTime(2000),
+                    lastDay: DateTime(2101),
+                    selectedDayPredicate: (day) => isSameDay(selectedDay, day),
+                    onDaySelected: (selectedDay, focusedDay) {
+                      setState(() {
+                        this.selectedDay = selectedDay;
+                        // Store the selected date in the controller
+                        String formattedDate = DateFormat('MM/dd/yyyy').format(selectedDay);
+                        dateController.text = formattedDate; // Store selected date here
+                      });
+                      Navigator.pop(context); // Close the calendar dialog after selecting the date
+                    },
+                  ),
+                ),
+                SizedBox(height: 10),
+              ],
+            ),
+          );
+        },
+      );
+    }
+
+
+
 
     showDialog(
       context: context,
@@ -609,24 +665,53 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                           ),
                           const SizedBox(height: 16),
                           // Time Picker
-                          GestureDetector(
-                            onTap: () => _selectTime(context),
-                            child: AbsorbPointer(
-                              child: TextField(
-                                controller: timeController,
-                                decoration: InputDecoration(
-                                  labelText: deliveryOption == 'Pick Up'
-                                      ? 'Set Pick Up Time'
-                                      : deliveryOption == 'Reservation'
-                                      ? 'Set Time'
-                                      : selectedTime.isEmpty
-                                      ? 'Select Delivery Time'
-                                      : selectedTime,
-                                  border: const OutlineInputBorder(),
+                          Row(
+                            children: [
+                              // First TextField (Set Time)
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () => _selectTime(context),
+                                  child: AbsorbPointer(
+                                    child: TextField(
+                                      controller: timeController,
+                                      decoration: InputDecoration(
+                                        labelText: deliveryOption == 'Pick Up'
+                                            ? 'Set Pick Up Time'
+                                            : deliveryOption == 'Reservation'
+                                            ? 'Set Time'
+                                            : selectedTime.isEmpty
+                                            ? 'Select Delivery Time'
+                                            : selectedTime,
+                                        border: const OutlineInputBorder(),
+                                      ),
+                                      keyboardType: TextInputType.datetime,
+                                      readOnly: true,
+                                    ),
+                                  ),
                                 ),
                               ),
-                            ),
+                              const SizedBox(width: 10),
+
+                              // Second TextField (Select Date)
+                              if (deliveryOption != 'Pick Up' && deliveryOption != 'Delivery')
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => _selectDate(context), // Open calendar on tap
+                                    child: AbsorbPointer( // Prevent typing inside TextField
+                                      child: TextField(
+                                        controller: dateController,
+                                        decoration: const InputDecoration(
+                                          labelText: 'Select Date',
+                                          border: OutlineInputBorder(),
+                                        ),
+                                        readOnly: true,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                            ],
                           ),
+
                           const SizedBox(height: 16),
                           // Payment method selection
                           const Text(
@@ -686,8 +771,11 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               String phoneNumber = phoneController.text.trim();
                               String address = addressController.text.trim();
                               String selectedTime = timeController.text.trim();
+                              String date = dateController.text.trim();
 
-                              if (fullName.isEmpty || phoneNumber.isEmpty || address.isEmpty || selectedTime.isEmpty) {
+                              bool isDateRequired = deliveryOption == 'Reservation';
+
+                              if (fullName.isEmpty || phoneNumber.isEmpty || address.isEmpty || selectedTime.isEmpty ||  (isDateRequired && date.isEmpty)) {
                                 showDialog(
                                   context: context,
                                   builder: (_) => AlertDialog(
@@ -727,28 +815,25 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                   final order = Order(
                                     orderId: _generateOrderId(),
                                     orderMethod: deliveryOption,
-                                    orderPlaced: DateTime.now().toString(),
+                                    orderPlaced: DateFormat('MM/dd/yyyy').format(DateTime.now()),
                                     amount: totalAmount,
                                     status: 'Pending',
                                     dishes: selectedItems,
                                     deliveryTime: selectedTime,
+                                    date: isDateRequired ? dateController.text.trim() : null,
                                   );
 
 
                                   if (order.orderMethod == 'Delivery' || order.orderMethod == 'Pick Up') {
                                     if (order.orderMethod == 'Delivery') {
-                                      if (!orders.contains(order)) {
-                                        orders.add(order);  // Add to orders list
-                                      }
+                                      orders.add(order); // Add to orders list
                                     } else if (order.orderMethod == 'Pick Up') {
-                                      if (!pickUpOrders.contains(order)) {
-                                        pickUpOrders.add(order);  // Add to pick up orders list
-                                      }
+                                      pickUpOrders.add(order); // Add to pick up orders list
                                     }
                                   } else if (order.orderMethod == 'Reservation') {
-
-                                    reservations.add(order);
+                                    reservations.add(order); // Add to reservations list
                                   }
+
 
                                   startFoodReadinessTimer(order.orderId);
 
