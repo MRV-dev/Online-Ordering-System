@@ -7,6 +7,7 @@ class Order {
   final List<String> dishes;
   final String? deliveryTime;
   final String? date;
+  final Map<String, int> quantities;
 
   Order({
     required this.orderId,
@@ -17,5 +18,6 @@ class Order {
     required this.dishes,
     this.deliveryTime,
     this.date,
+    required this.quantities,
   });
 }

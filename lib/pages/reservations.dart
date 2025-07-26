@@ -34,7 +34,7 @@ class _ReservationsPageState extends State<ReservationsPage>
     );
   }
 
-  // Function to build the list of orders or reservations
+
   Widget _buildOrderList(List<Order> orderList) {
     return ListView.builder(
       itemCount: orderList.length,
@@ -49,35 +49,35 @@ class _ReservationsPageState extends State<ReservationsPage>
   Widget _buildOrderCard(Order order) {
     List<Widget> children = [];
 
-    // Display reservation details
+
     children.add(Text(
         'Reservation ID: ${order.orderId}',
         style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)
     ));
     children.add(const SizedBox(height: 8));
 
-    // Display the order method
+
     children.add(Text(
         'Order Method: ${order.orderMethod}',
         style: const TextStyle(fontSize: 14)
     ));
     children.add(const SizedBox(height: 8));
 
-    // Display the order placed date
+
     children.add(Text(
         'Order Placed: ${order.orderPlaced}',
         style: const TextStyle(fontSize: 14)
     ));
     children.add(const SizedBox(height: 8));
 
-    // Display the amount
+
     children.add(Text(
         'Amount: ₱${order.amount.toStringAsFixed(2)}',
         style: const TextStyle(fontSize: 14)
     ));
     children.add(const SizedBox(height: 8));
 
-    // Display scheduled time if available
+
     if (order.deliveryTime != null && order.deliveryTime!.isNotEmpty) {
       children.add(Text(
           'Scheduled Time: ${order.deliveryTime}',
@@ -86,10 +86,10 @@ class _ReservationsPageState extends State<ReservationsPage>
     }
     children.add(const SizedBox(height: 8));
 
-    // Display scheduled date if available
+
     if (order.date != null && order.date!.isNotEmpty) {
       children.add(Text(
-          'Scheduled Date: ${order.date}',  // Display the selected date
+          'Scheduled Date: ${order.date}',
           style: const TextStyle(fontSize: 14)
       ));
     }

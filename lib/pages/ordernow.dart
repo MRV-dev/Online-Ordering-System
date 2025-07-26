@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -22,6 +23,17 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
   String deliveryOption = 'Delivery';
   final ImagePicker _picker = ImagePicker();
   File? _image;
+  Timer? _orderTimer;
+
+
+  double _parsePrice(String priceStr) {
+    try {
+      return double.parse(priceStr.replaceAll('₱', '').trim());
+    } catch (e) {
+      print('Error parsing price: $priceStr');
+      return 0.0;  // Return a default value in case of error
+    }
+  }
 
 
   Future<void> _pickImage() async {
@@ -114,6 +126,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
   @override
   void dispose() {
     _controller.dispose();
+    _orderTimer?.cancel();
     super.dispose();
   }
 
@@ -526,10 +539,10 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
         builder: (BuildContext context) {
           return Dialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15.0), // Rounded corners for the dialog
+              borderRadius: BorderRadius.circular(15.0),
             ),
-            elevation: 5, // Shadow for the dialog
-            backgroundColor: Colors.white, // White background for the dialog
+            elevation: 5,
+            backgroundColor: Colors.white,
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -555,7 +568,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                         String formattedDate = DateFormat('MM/dd/yyyy').format(selectedDay);
                         dateController.text = formattedDate; // Store selected date here
                       });
-                      Navigator.pop(context); // Close the calendar dialog after selecting the date
+                      Navigator.pop(context);
                     },
                   ),
                 ),
@@ -611,7 +624,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                             ),
                           ),
-                          // Full Name
+
                           TextField(
                             controller: fullNameController,
                             decoration: const InputDecoration(
@@ -620,7 +633,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                             ),
                           ),
                           const SizedBox(height: 16),
-                          // Phone Number
+
                           TextField(
                             controller: phoneController,
                             decoration: const InputDecoration(
@@ -630,6 +643,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                             keyboardType: TextInputType.phone,
                           ),
                           const SizedBox(height: 16),
+
                           // Address Field for Pick Up and Delivery
                           deliveryOption == 'Reservation'
                               ? TextField(
@@ -696,8 +710,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               if (deliveryOption != 'Pick Up' && deliveryOption != 'Delivery')
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _selectDate(context), // Open calendar on tap
-                                    child: AbsorbPointer( // Prevent typing inside TextField
+                                    onTap: () => _selectDate(context),
+                                    child: AbsorbPointer(
                                       child: TextField(
                                         controller: dateController,
                                         decoration: const InputDecoration(
@@ -790,7 +804,8 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                 );
                               } else {
                                 List<String> selectedItems = [];
-                                double totalAmount = 0;
+                                double totalAmount = 0.0;
+
                                 quantities.forEach((name, quantity) {
                                   if (quantity > 0) {
                                     selectedItems.add(name);
@@ -812,6 +827,22 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
 
                                 // Create the order if items are selected
                                 if (selectedItems.isNotEmpty) {
+                                  // Combine all dish data into a single list (dishes, bilao, and desserts)
+                                  List<Map<String, String>> dishesData = [...dishes, ...bilao, ...desserts];
+
+                                  // Calculate total amount before creating the Order
+                                  for (var dish in selectedItems) {
+                                    int quantity = quantities[dish] ?? 0;
+                                    if (quantity > 0) {
+                                      var dishData = dishesData.firstWhere((d) => d['name'] == dish, orElse: () => {});
+                                      if (dishData.isNotEmpty) {
+                                        double price = _parsePrice(dishData['price'] ?? '0.00');
+                                        totalAmount += price * quantity;
+                                      }
+                                    }
+                                  }
+
+                                  // Now create the order with the calculated totalAmount
                                   final order = Order(
                                     orderId: _generateOrderId(),
                                     orderMethod: deliveryOption,
@@ -821,6 +852,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     dishes: selectedItems,
                                     deliveryTime: selectedTime,
                                     date: isDateRequired ? dateController.text.trim() : null,
+                                    quantities: quantities,
                                   );
 
 
@@ -850,24 +882,25 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
 
                                   _showOrderPlacedModal(context);
 
-                                  Future.delayed(Duration(seconds: 10), () {
-                                    setState(() {
-                                      order.status = 'Delivered';
+                                  _orderTimer = Timer(Duration(seconds: 10), () {
+                                    if (mounted) {
+                                      setState(() {
+                                        order.status = 'Delivered';
+                                        if (order.orderMethod != 'Reservation') {
+                                          orders.remove(order);
+                                        }
+                                        orderHistory.add(order);
+                                      });
 
-                                      if (order.orderMethod != 'Reservation') {
-                                        orders.remove(order);
-                                      }
-                                      orderHistory.add(order);
-                                    });
-
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => OrderHistory(orders: orderHistory, pickUpOrders: pickUpOrders),
-                                      ),
-                                    );
-
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => OrderHistory(orders: orderHistory, pickUpOrders: pickUpOrders,),
+                                        ),
+                                      );
+                                    }
                                   });
+
                                 } else {
                                   _showCustomSnackBar('Please add items to your order.');
                                 }

@@ -53,11 +53,22 @@ void startDeliveryTimer(String orderId) {
 class Orders extends StatefulWidget {
   const Orders({super.key});
 
-@override
+  @override
   _OrdersState createState() => _OrdersState();
 }
 
 class _OrdersState extends State<Orders> {
+
+  // Parsing function to handle price conversion
+  double _parsePrice(String priceStr) {
+    try {
+      return double.parse(priceStr.replaceAll('₱', '').trim());  // Remove the ₱ symbol and parse the value
+    } catch (e) {
+      print('Error parsing price: $priceStr');
+      return 0.0;  // Return a default value in case of error
+    }
+  }
+
 
   bool isPlacedGreen = false;
   bool isInProcessGreen = false;
@@ -168,16 +179,21 @@ class _OrdersState extends State<Orders> {
                     _showPickupDialog(context, order);
                   } else{
                     _showTrackOrderDialog(context, order, _updateOrders);
-                    }
-                  } ,
+                  }
+                } ,
                 iconSize: 18,
               ),
               IconButton(
                 icon: const Icon(FontAwesomeIcons.receipt),
                 onPressed: () {
-                  _showViewOrderDialog(context, order);
+                  // Ensure the order has dishes
+                  if (order != null && order.dishes.isNotEmpty) {
+                    _showViewOrderDialog(context, order);
+                  } else {
+                    print("No dishes found in the order.");
+                  }
                 },
-              ),
+              )
             ],
           ),
         ],
@@ -189,11 +205,11 @@ class _OrdersState extends State<Orders> {
   void _updateOrders(Order order) {
     setState(() {
       if (order.orderMethod == "Reservation") {
-        reservations.remove(order);  // Remove the order from reservations list
+        reservations.remove(order);
       } else {
-        orders.remove(order);  // Remove the order from orders list
+        orders.remove(order);
       }
-      orderHistory.add(order);  // Add to order history list
+      orderHistory.add(order);
     });
   }
 
@@ -217,13 +233,13 @@ class _OrdersState extends State<Orders> {
             bool isCompletedGreen = progress >= 2;
             bool showDeliveredMessage = isCompletedGreen;
 
-            // When completed, auto close the dialog & remove order after a short delay
+
             if (isCompletedGreen) {
               Future.delayed(Duration(seconds: 3), () {
                 if (Navigator.canPop(context)) {
-                  Navigator.pop(context); // close dialog
+                  Navigator.pop(context);
                 }
-                updateOrders(order); // Call updateOrders to update the order list
+                updateOrders(order);
                 deliveryProgressMap.remove(order.orderId);
               });
             }
@@ -311,9 +327,6 @@ class _OrdersState extends State<Orders> {
   }
 
 
-
-
-
   void _showPickupDialog(BuildContext context, Order order) {
     final readinessNotifier = orderReadinessMap[order.orderId];
 
@@ -341,7 +354,7 @@ class _OrdersState extends State<Orders> {
                   onPressed: isFoodReady
                       ? () {
                     setState(() {
-                      pickUpOrders.remove(order); // Remove from active orders
+                      pickUpOrders.remove(order);
                       orderHistory.add(order);
                     });
                     Navigator.pop(context);
@@ -361,28 +374,23 @@ class _OrdersState extends State<Orders> {
   }
 
 
-
-
-
-
-
-
-
-  // View Order Dialog (order details)
   void _showViewOrderDialog(BuildContext context, Order order) {
-    List<Map<String, dynamic>> items = [];
-    for (var dish in order.dishes) {
-      // Create items based on the dishes list
-      items.add({"name": dish, "qty": 1, "price": 100});
+    // Ensure the order contains dishes and quantities
+    if (order == null || order.dishes.isEmpty || order.quantities.isEmpty) {
+      print("No valid order data available.");
+      return;
     }
 
-    int total = items.fold(0, (sum, item) => sum + ((item["qty"] * item["price"]) as int));
+    // Debugging: Output the order dishes and quantities
+    print("Order Dishes: ${order.dishes}");
+    print("Order Quantities: ${order.quantities}");
 
+    // Show the dialog
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        title: const Text("View Order", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Order Details", style: TextStyle(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -393,13 +401,15 @@ class _OrdersState extends State<Orders> {
               const Divider(),
               const Text("Items:", style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              ...items.map((item) => Text("• ${item['name']} x${item['qty']} - ₱${item['qty'] * item['price']}")),
+              // Display dish names and quantities
+              if (order.dishes.isEmpty)
+                Text("No items in this order.")
+              else
+                ...order.dishes.map((dish) {
+                  int quantity = order.quantities[dish] ?? 0;  // Get quantity from order.quantities
+                  return Text("• $dish x$quantity");
+                }),
               const Divider(),
-              Text("Total: ₱$total", style: const TextStyle(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              if (order.orderMethod == "Delivery") ...[
-                Text("Time to Deliver: ${order.deliveryTime}"),
-              ],
             ],
           ),
         ),
