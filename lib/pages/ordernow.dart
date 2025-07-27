@@ -519,7 +519,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     int numberOfPeople = 1;
 
 
-    Future<void> _selectTime(BuildContext context) async {
+    Future<void> selectTime(BuildContext context) async {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
@@ -533,7 +533,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
       }
     }
 
-    Future<void> _selectDate(BuildContext context) async {
+    Future<void> selectDate(BuildContext context) async {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -684,7 +684,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               // First TextField (Set Time)
                               Expanded(
                                 child: GestureDetector(
-                                  onTap: () => _selectTime(context),
+                                  onTap: () => selectTime(context),
                                   child: AbsorbPointer(
                                     child: TextField(
                                       controller: timeController,
@@ -710,7 +710,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                               if (deliveryOption != 'Pick Up' && deliveryOption != 'Delivery')
                                 Expanded(
                                   child: GestureDetector(
-                                    onTap: () => _selectDate(context),
+                                    onTap: () => selectDate(context),
                                     child: AbsorbPointer(
                                       child: TextField(
                                         controller: dateController,
@@ -789,17 +789,55 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
 
                               bool isDateRequired = deliveryOption == 'Reservation';
 
-                              if (fullName.isEmpty || phoneNumber.isEmpty || address.isEmpty || selectedTime.isEmpty ||  (isDateRequired && date.isEmpty)) {
+                               if (fullName.isEmpty || phoneNumber.isEmpty || address.isEmpty || selectedTime.isEmpty ||  (isDateRequired && date.isEmpty)) {
                                 showDialog(
                                   context: context,
+                                  barrierDismissible: true,
                                   builder: (_) => AlertDialog(
-                                    content: const Text('Please fill in all the fields before proceeding.'),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () => Navigator.pop(context),
-                                        child: const Text('OK'),
+                                    backgroundColor: Color(0xFFFFFBEB),
+                                    title: Column(
+                                      children: [
+                                        SizedBox(height: 10,),
+                                        Icon(FontAwesomeIcons.warning, color: Colors.red, size: 50),
+                                      ],
+                                    ),
+                                      content:SizedBox(
+                                        width: 200,
+                                        height: 70,
+                                        child: Center(
+                                          child: Text('Please fill in the details before proceeding.', style: TextStyle(
+                                              fontWeight: FontWeight.bold, fontSize: 16
+                                          ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      )
+                                  ),
+                                );
+                              }
+                              else if (_image == null) {
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: true,
+                                  builder: (_) => AlertDialog(
+                                      backgroundColor: Color(0xFFFFFBEB),
+                                      title: Column(
+                                        children: [
+                                          SizedBox(height: 10,),
+                                          Icon(FontAwesomeIcons.warning, color: Colors.red, size: 50),
+                                        ],
                                       ),
-                                    ],
+                                      content:SizedBox(
+                                        width: 200,
+                                        height: 70,
+                                        child: Center(
+                                          child: Text('Please upload the payment image before proceeding.', style: TextStyle(
+                                              fontWeight: FontWeight.bold, fontSize: 16
+                                          ),
+                                            textAlign: TextAlign.center,
+                                          ),
+                                        ),
+                                      )
                                   ),
                                 );
                               } else {
@@ -811,7 +849,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     selectedItems.add(name);
                                     String price = '';
 
-                                    // Check if the item belongs to Dishes, Bilao, or Desserts
                                     if (dishes.any((dish) => dish['name'] == name)) {
                                       price = dishes.firstWhere((dish) => dish['name'] == name)['price']!;
                                     } else if (bilao.any((dish) => dish['name'] == name)) {
@@ -820,17 +857,14 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                       price = desserts.firstWhere((dish) => dish['name'] == name)['price']!;
                                     }
 
-                                    // Update total amount
                                     totalAmount += double.parse(price.replaceAll('₱', '').replaceAll(',', '')) * quantity;
                                   }
                                 });
 
-                                // Create the order if items are selected
+
                                 if (selectedItems.isNotEmpty) {
-                                  // Combine all dish data into a single list (dishes, bilao, and desserts)
                                   List<Map<String, String>> dishesData = [...dishes, ...bilao, ...desserts];
 
-                                  // Calculate total amount before creating the Order
                                   for (var dish in selectedItems) {
                                     int quantity = quantities[dish] ?? 0;
                                     if (quantity > 0) {
@@ -842,7 +876,6 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
                                     }
                                   }
 
-                                  // Now create the order with the calculated totalAmount
                                   final order = Order(
                                     orderId: _generateOrderId(),
                                     orderMethod: deliveryOption,
@@ -930,28 +963,36 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
     );
   }
 
-
   String _generateOrderId() {
-    final randomNumber = DateTime.now().millisecondsSinceEpoch % 100000;  // Generate a random number with max 5 digits
-    return randomNumber.toString().padLeft(5, '0');  // Pad the number with leading zeros to ensure it's 5 digits
+    final randomNumber = DateTime.now().millisecondsSinceEpoch % 100000;
+    return randomNumber.toString().padLeft(5, '0');
   }
 
 
   void _showOrderPlacedModal(BuildContext context) {
     showDialog(
       context: context,
+      barrierDismissible: true,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Icon(Icons.check_circle, color: Colors.green, size: 60),
-          content: Text('Order placed successfully!'),
-          actions: <Widget>[
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the confirmation modal
-              },
-              child: const Text('Ok'),
+          backgroundColor: Color(0xFFFFFBEB),
+          title: Column(
+            children: [
+              SizedBox(height: 30,),
+              Icon(FontAwesomeIcons.circleCheck, color: Colors.green, size: 60),
+            ],
+          ),
+          content:SizedBox(
+            width: 200,
+            height: 70,
+            child: Center(
+              child: Text('Order placed successfully!', style: TextStyle(
+                  fontWeight: FontWeight.bold, fontSize: 17
+              ),
+                textAlign: TextAlign.center,
+              ),
             ),
-          ],
+          )
         );
       },
     );

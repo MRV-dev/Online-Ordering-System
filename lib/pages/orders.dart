@@ -49,27 +49,24 @@ class _OrdersState extends State<Orders> {
     deliveryProgressMap[orderId] = notifier;
     orderCompletionMap[orderId] = ValueNotifier<bool>(false);
 
-    Timer timer = Timer.periodic(Duration(seconds: 10), (timer) {
+    Timer timer = Timer.periodic(Duration(seconds: 8), (timer) {
       final currentProgress = notifier.value;
 
       if (currentProgress >= 3) {
         timer.cancel();
         deliveryTimers.remove(orderId);
 
-        // Mark the order as completed
         orderCompletionMap[orderId]?.value = true;
 
-        // Wait for 1 second, then remove the order from active list
-        Future.delayed(Duration(seconds: 1), () {
+        Future.delayed(Duration(seconds: 0), () {
           final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
           if (orderToRemove != null) {
             setState(() {
-              orders.remove(orderToRemove);  // Remove from active orders
-              orderHistory.add(orderToRemove);  // Add to order history
+              orders.remove(orderToRemove);
+              orderHistory.add(orderToRemove);
             });
           }
 
-          // Clean up progress tracking for this order
           deliveryProgressMap.remove(orderId);
         });
       } else {
@@ -79,10 +76,6 @@ class _OrdersState extends State<Orders> {
 
     deliveryTimers[orderId] = timer;
   }
-
-
-
-
 
   @override
   void initState() {
@@ -102,37 +95,43 @@ class _OrdersState extends State<Orders> {
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: Column(
           children: [
-            const Text(
-              'Orders',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
-            ),
+
             const SizedBox(height: 20),
-            ListView.builder(
+
+            (orders.isEmpty && pickUpOrders.isEmpty)
+                ? Padding(
+              padding: const EdgeInsets.only(top: 260),
+              child: Center(
+                child: Text(
+                  'No Orders Available',
+                  style: TextStyle(fontSize: 18, color: Colors.grey, fontWeight: FontWeight.bold),
+                ),
+              ),
+            )
+                : ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: orders.where((order) => order.orderMethod != 'Reservation').length +
-                  pickUpOrders.length, // We are only counting non-reservation orders
+                  pickUpOrders.length,
               itemBuilder: (context, index) {
-                // Get the order and display it
                 Order order;
                 if (index < orders.where((order) => order.orderMethod != 'Reservation').length) {
                   order = orders.where((order) => order.orderMethod != 'Reservation').toList()[index];
                 } else {
                   order = pickUpOrders[index - orders.where((order) => order.orderMethod != 'Reservation').length];
                 }
-
                 return _buildOrderCard(order, context);
               },
             ),
-            // Display a message if no orders are found
-            orders.isEmpty && pickUpOrders.isEmpty
-                ? Center(child: Text('No orders found.'))
-                : SizedBox.shrink(),
           ],
         ),
       ),
     );
   }
+
+
+
+
 
 
   Widget _buildOrderCard(Order order, BuildContext context) {
@@ -141,17 +140,14 @@ class _OrdersState extends State<Orders> {
     return ValueListenableBuilder<bool>(
       valueListenable: orderCompletionNotifier ?? ValueNotifier(false),
       builder: (context, isCompleted, _) {
-        // When the order is completed, we will remove it automatically
+
         if (isCompleted) {
-          // Ensure the order is not already in history before adding it
           Future.delayed(Duration(seconds: 1), () {
             setState(() {
-              // Remove the order from active orders
               orders.removeWhere((o) => o.orderId == order.orderId);
 
-              // Add the order to history only if it's not already there
               if (!orderHistory.any((o) => o.orderId == order.orderId)) {
-                orderHistory.add(order);  // Add to order history
+                orderHistory.add(order);
               }
             });
           });
@@ -222,9 +218,6 @@ class _OrdersState extends State<Orders> {
       },
     );
   }
-
-
-
 
   void _updateOrders(Order order) {
     setState(() {
@@ -304,7 +297,7 @@ class _OrdersState extends State<Orders> {
                       ),
                       child: Row(
                         children: const [
-                          Icon(Icons.info_outline, color: Colors.grey),
+                          Icon(FontAwesomeIcons.circleCheck, color: Colors.green),
                           SizedBox(width: 10),
                           Expanded(child: Text("Your order has been delivered")),
                         ],
@@ -319,7 +312,7 @@ class _OrdersState extends State<Orders> {
                       ),
                       child: Row(
                         children: const [
-                          Icon(Icons.info_outline, color: Colors.grey),
+                          Icon(FontAwesomeIcons.circleCheck, color: Colors.grey),
                           SizedBox(width: 10),
                           Expanded(child: Text("Your order is being processed")),
                         ],
@@ -376,10 +369,10 @@ class _OrdersState extends State<Orders> {
                     Navigator.pop(context);
                   }
                       : null,
-                  child: const Text("Pickup Complete"),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: isFoodReady ? Colors.green : Colors.grey,
                   ),
+                  child: const Text("Pickup Complete"),
                 ),
               ],
             );
@@ -417,13 +410,11 @@ class _OrdersState extends State<Orders> {
               const Divider(),
               const Text("Items:", style: TextStyle(fontWeight: FontWeight.bold)),
               const SizedBox(height: 6),
-              // Display dish names and quantities
               if (order.dishes.isEmpty)
                 Text("No items in this order.")
               else
                 ...order.dishes.map((dish) {
-                  int quantity = order.quantities[dish] ?? 0;  // Get quantity from order.quantities
-                  return Text("• $dish x$quantity");
+                  return Text("• $dish ");
                 }),
               const Divider(),
             ],

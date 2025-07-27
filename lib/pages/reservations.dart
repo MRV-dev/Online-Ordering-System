@@ -29,7 +29,14 @@ class _ReservationsPageState extends State<ReservationsPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xFFFFFBEB),
-      body: _buildOrderList(reservations),
+      body: reservations.isEmpty
+          ? Center(
+        child: Text(
+          'No reservations available.',
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+        ),
+      )
+          : _buildOrderList(reservations),
     );
   }
 

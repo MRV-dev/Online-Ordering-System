@@ -14,8 +14,6 @@ class OrderHistory extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('Order History',
-              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
           const SizedBox(height: 10),
           if (orders.isNotEmpty)
             ListView.builder(
@@ -28,7 +26,20 @@ class OrderHistory extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 13),
                   color: Colors.white,
                   child: ListTile(
-                    title: Text('Order ID: ${order.orderId}'),
+                    title: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,  // Space between the items
+                      children: [
+                        Text(
+                          'Order ID: ${order.orderId}',
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        // Placed text at the top right
+                        Text(
+                          '${order.orderPlaced}',
+                          style: TextStyle(fontSize: 14),
+                        ),
+                      ],
+                    ),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -37,11 +48,9 @@ class OrderHistory extends StatelessWidget {
                         Row(
                           children: [
                             Text('Status: '),
-                            Text('Processed', style: TextStyle(color: Colors.green),),
+                            Text('Processed', style: TextStyle(color: Colors.green)),
                           ],
                         ),
-
-                        Text('Placed: ${order.orderPlaced}'),
                       ],
                     ),
                     onTap: () => _showOrderDetailsModal(context, order),
@@ -50,12 +59,24 @@ class OrderHistory extends StatelessWidget {
               },
             )
           else
-            const Text('No orders found.',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(height: 260),
+                const Text(
+                  'No orders in your history yet. Start ordering now!',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.grey),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
         ],
       ),
     );
   }
+
+
+
 
   // Determine order method and display the appropriate text
   String _getOrderMethod(Order order) {
@@ -121,37 +142,5 @@ class OrderHistory extends StatelessWidget {
       }
     }
     return price;
-  }
-
-  // Helper method to build individual order cards
-  Widget _buildOrderCard(String orderId, String orderMethod, String orderPlaced, String amount, BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text('Order ID: $orderId', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 8),
-          Text('Order Method: $orderMethod', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          Text('Reserved For: $orderPlaced', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 8),
-          Text('Amount: $amount', style: const TextStyle(fontSize: 14)),
-          const SizedBox(height: 12),
-        ],
-      ),
-    );
   }
 }

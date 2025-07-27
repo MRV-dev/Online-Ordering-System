@@ -72,8 +72,9 @@ class _NotificationsState extends State<Notifications> {
           ],
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+      body: Container(
+        color: Color(0xFFFFFBEB),  // Set your desired background color here
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -83,7 +84,7 @@ class _NotificationsState extends State<Notifications> {
             ),
             const SizedBox(height: 20),
             Row(
-              mainAxisAlignment: MainAxisAlignment.end,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 _notifButton("✔️ Mark all as Read", Colors.green, _markAllAsRead),
                 const SizedBox(width: 8),
@@ -99,7 +100,7 @@ class _NotificationsState extends State<Notifications> {
             ),
           ],
         ),
-      ),
+      )
     );
   }
 
