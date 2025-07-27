@@ -26,6 +26,7 @@ class OrderHistory extends StatelessWidget {
                 final order = orders[index];
                 return Card(
                   margin: const EdgeInsets.symmetric(vertical: 13),
+                  color: Colors.white,
                   child: ListTile(
                     title: Text('Order ID: ${order.orderId}'),
                     subtitle: Column(

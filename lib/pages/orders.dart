@@ -22,33 +22,6 @@ void startFoodReadinessTimer(String orderId) {
   });
 }
 
-void startDeliveryTimer(String orderId) {
-  if (deliveryProgressMap.containsKey(orderId)) return;
-
-  final notifier = ValueNotifier<int>(0);
-  deliveryProgressMap[orderId] = notifier;
-
-  Timer timer = Timer.periodic(Duration(seconds: 15), (timer) {
-    final currentProgress = notifier.value;
-    if (currentProgress >= 2) {
-      timer.cancel();
-      deliveryTimers.remove(orderId);
-
-
-      final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
-      if (orderToRemove != null) {
-        orders.remove(orderToRemove);
-        orderHistory.add(orderToRemove);
-        deliveryProgressMap.remove(orderId);
-      }
-    } else {
-      notifier.value = currentProgress + 1;
-    }
-  });
-
-  deliveryTimers[orderId] = timer;
-}
-
 
 class Orders extends StatefulWidget {
   const Orders({super.key});
@@ -59,19 +32,11 @@ class Orders extends StatefulWidget {
 
 class _OrdersState extends State<Orders> {
 
-  // Parsing function to handle price conversion
-  double _parsePrice(String priceStr) {
-    try {
-      return double.parse(priceStr.replaceAll('₱', '').trim());  // Remove the ₱ symbol and parse the value
-    } catch (e) {
-      print('Error parsing price: $priceStr');
-      return 0.0;  // Return a default value in case of error
-    }
-  }
 
 
   bool isPlacedGreen = false;
   bool isInProcessGreen = false;
+  bool isoutfordeliveryGreen = false;
   bool isCompletedGreen = false;
   bool isCompleteButtonEnabled = false;
   bool isPickupCompleteButtonEnabled = false;
@@ -79,10 +44,48 @@ class _OrdersState extends State<Orders> {
   bool isPickupInProcess = false;
 
 
+  void startDeliveryTimer(String orderId) {
+    if (deliveryProgressMap.containsKey(orderId)) return;
+
+    final notifier = ValueNotifier<int>(0);
+    deliveryProgressMap[orderId] = notifier;
+
+    Timer timer = Timer.periodic(Duration(seconds: 15), (timer) {
+      final currentProgress = notifier.value;
+
+      if (currentProgress >= 3) {
+        timer.cancel();
+        deliveryTimers.remove(orderId);
+
+
+        final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
+        if (orderToRemove != null) {
+          setState(() {
+            orders.remove(orderToRemove);
+            orderHistory.add(orderToRemove);
+          });
+        }
+        deliveryProgressMap.remove(orderId);
+
+        // Trigger update for completed status
+        setState(() {
+          isCompletedGreen = true;
+        });
+
+      } else {
+        notifier.value = currentProgress + 1;
+      }
+    });
+
+    deliveryTimers[orderId] = timer;
+  }
+
+
+
+
   @override
   void initState() {
     super.initState();
-
     for (var order in orders) {
       if (order.orderMethod == "Delivery") {
         startDeliveryTimer(order.orderId);
@@ -93,7 +96,7 @@ class _OrdersState extends State<Orders> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFFFFBEB),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(vertical: 24),
         child: Column(
@@ -103,7 +106,6 @@ class _OrdersState extends State<Orders> {
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 20),
-            // Filter out reservation orders from the list
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
@@ -223,28 +225,18 @@ class _OrdersState extends State<Orders> {
 
     showDialog(
       context: context,
-      barrierDismissible: false,
+      barrierDismissible: true,
       builder: (context) {
         return ValueListenableBuilder<int>(
           valueListenable: deliveryProgressMap[order.orderId] ?? ValueNotifier(0),
           builder: (context, progress, _) {
             bool isPlacedGreen = progress >= 0;
             bool isInProcessGreen = progress >= 1;
-            bool isCompletedGreen = progress >= 2;
-            bool showDeliveredMessage = isCompletedGreen;
-
-
-            if (isCompletedGreen) {
-              Future.delayed(Duration(seconds: 3), () {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                }
-                updateOrders(order);
-                deliveryProgressMap.remove(order.orderId);
-              });
-            }
+            bool isOutForDeliveryGreen = progress >= 2;
+            bool isCompletedGreen = progress >= 3;
 
             return AlertDialog(
+              backgroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               title: const Text("Track Order", style: TextStyle(fontWeight: FontWeight.bold)),
               content: Column(
@@ -259,6 +251,8 @@ class _OrdersState extends State<Orders> {
                           SizedBox(height: 8),
                           Icon(FontAwesomeIcons.circle, color: isInProcessGreen ? Colors.green : Colors.grey),
                           SizedBox(height: 8),
+                          Icon(FontAwesomeIcons.circle, color: isOutForDeliveryGreen ? Colors.green : Colors.grey),
+                          SizedBox(height: 8),
                           Icon(FontAwesomeIcons.circle, color: isCompletedGreen ? Colors.green : Colors.grey),
                         ],
                       ),
@@ -271,6 +265,8 @@ class _OrdersState extends State<Orders> {
                             SizedBox(height: 15),
                             Text("In Process", style: TextStyle(fontWeight: FontWeight.w500)),
                             SizedBox(height: 15),
+                            Text("Out For Delivery", style: TextStyle(fontWeight: FontWeight.w500)),
+                            SizedBox(height: 15),
                             Text("Completed", style: TextStyle(fontWeight: FontWeight.w500)),
                           ],
                         ),
@@ -278,7 +274,7 @@ class _OrdersState extends State<Orders> {
                     ],
                   ),
                   SizedBox(height: 20),
-                  if (showDeliveredMessage)
+                  if (isCompletedGreen)
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -293,7 +289,7 @@ class _OrdersState extends State<Orders> {
                         ],
                       ),
                     ),
-                  if (!showDeliveredMessage)
+                  if (!isCompletedGreen)
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
@@ -311,7 +307,7 @@ class _OrdersState extends State<Orders> {
                 ],
               ),
               actions: [
-                if (!showDeliveredMessage)
+                if (!isCompletedGreen)
                   TextButton(
                     onPressed: () {
                       Navigator.pop(context);
@@ -327,11 +323,11 @@ class _OrdersState extends State<Orders> {
   }
 
 
+
   void _showPickupDialog(BuildContext context, Order order) {
     final readinessNotifier = orderReadinessMap[order.orderId];
 
     if (readinessNotifier == null) {
-      // If not already started, start the timer
       startFoodReadinessTimer(order.orderId);
     }
 
@@ -375,13 +371,12 @@ class _OrdersState extends State<Orders> {
 
 
   void _showViewOrderDialog(BuildContext context, Order order) {
-    // Ensure the order contains dishes and quantities
+
     if (order == null || order.dishes.isEmpty || order.quantities.isEmpty) {
       print("No valid order data available.");
       return;
     }
 
-    // Debugging: Output the order dishes and quantities
     print("Order Dishes: ${order.dishes}");
     print("Order Quantities: ${order.quantities}");
 
@@ -389,6 +384,7 @@ class _OrdersState extends State<Orders> {
     showDialog(
       context: context,
       builder: (_) => AlertDialog(
+        backgroundColor: Colors.white,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         title: const Text("Order Details", style: TextStyle(fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import '../globals.dart';
 import '../models/orderhistorymodel.dart';
 
@@ -29,7 +28,7 @@ class _ReservationsPageState extends State<ReservationsPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFFFFBEB),
       body: _buildOrderList(reservations),
     );
   }

@@ -77,7 +77,7 @@ class _AccountState extends State<Account> {
         .width < 768;
 
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: Color(0xFFFFFBEB),
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: const Color(0xFFEFCA6C),
@@ -101,7 +101,7 @@ class _AccountState extends State<Account> {
             : null,
       ),
       endDrawer: Drawer(
-        backgroundColor: const Color(0xFFEFCA6C),
+        backgroundColor: Color(0xFFEFCA6C),
         width: 200,
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 12),
