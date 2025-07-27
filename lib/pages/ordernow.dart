@@ -1281,24 +1281,25 @@ void _showLogoutModal(BuildContext context) {
           ElevatedButton(
             onPressed: () => Navigator.pushReplacementNamed(context, '/login'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: Colors.black,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(30),
-                side: const BorderSide(color: Colors.black),
               ),
               minimumSize: const Size.fromHeight(50),
             ),
-            child: const Text('Logout'),
+            child: const Text('Logout', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
           ),
           const SizedBox(height: 10),
-          OutlinedButton(
+          ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            style: OutlinedButton.styleFrom(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.green,
+              foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
               minimumSize: const Size.fromHeight(50),
             ),
-            child: const Text('Cancel'),
+            child: const Text('Cancel', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),),
           ),
         ],
       ),
