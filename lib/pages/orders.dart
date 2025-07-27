@@ -50,26 +50,30 @@ class _OrdersState extends State<Orders> {
     final notifier = ValueNotifier<int>(0);
     deliveryProgressMap[orderId] = notifier;
 
-    Timer timer = Timer.periodic(Duration(seconds: 15), (timer) {
+    Timer timer = Timer.periodic(Duration(seconds: 10), (timer) {
       final currentProgress = notifier.value;
 
       if (currentProgress >= 3) {
         timer.cancel();
         deliveryTimers.remove(orderId);
 
-
-        final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
-        if (orderToRemove != null) {
-          setState(() {
-            orders.remove(orderToRemove);
-            orderHistory.add(orderToRemove);
-          });
-        }
-        deliveryProgressMap.remove(orderId);
-
-        // Trigger update for completed status
         setState(() {
           isCompletedGreen = true;
+        });
+
+        Future.delayed(Duration(seconds: 1), () {
+          final orderToRemove = orders.firstWhereOrNull((o) => o.orderId == orderId);
+
+
+          if (orderToRemove != null) {
+            setState(() {
+              orders.remove(orderToRemove);
+              orderHistory.add(orderToRemove);
+            });
+          }
+
+
+          deliveryProgressMap.remove(orderId);
         });
 
       } else {
@@ -79,8 +83,6 @@ class _OrdersState extends State<Orders> {
 
     deliveryTimers[orderId] = timer;
   }
-
-
 
 
   @override
