@@ -523,6 +523,19 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
       final TimeOfDay? picked = await showTimePicker(
         context: context,
         initialTime: TimeOfDay.now(),
+        builder: (BuildContext context, Widget? child) {
+          return Theme(
+            data: ThemeData.dark().copyWith( // You can use dark or light theme
+              primaryColor: Colors.orange, // Change the color of the header (Time of day)
+              hintColor: Colors.orange, // Change the accent color (e.g., time picker buttons)
+              buttonTheme: ButtonThemeData(
+                textTheme: ButtonTextTheme.primary,
+              ),
+              scaffoldBackgroundColor: Colors.white, // Change background color
+            ),
+            child: child!,
+          );
+        },
       );
 
       if (picked != null && picked != TimeOfDay.now()) {
@@ -532,6 +545,7 @@ class _OrdernowState extends State<Ordernow> with TickerProviderStateMixin {
         });
       }
     }
+
 
     Future<void> selectDate(BuildContext context) async {
       showDialog(
